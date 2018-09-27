@@ -5,7 +5,9 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "node server.js",
+    "installdeployscript": "git remote add aws ssh://kiddiekredit:/home/ubuntu/kiddiekredit-api/repo",
+    "deploy": "git add . && git commit && git push origin master && git push aws master"
   },
   "repository": {
     "type": "git",
