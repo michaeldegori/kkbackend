@@ -12,7 +12,7 @@ module.exports = {
             },
             env_production : {
                 NODE_ENV: 'production',
-                APIPORT: 443
+                APIPORT: 80
             }
         },
     ],
