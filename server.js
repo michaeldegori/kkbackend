@@ -12,7 +12,10 @@ const FamilyUnit = require('./src/services/FamilyUnit/model.js')(db);
 
 //middlewares and health check
 app.use(bp.json());
-app.get('/healthcheck', (req, res) => res.end("health check succeeded"));
+app.get('/healthcheck', (req, res) => {
+    console.log('received health check');
+    res.end("health check succeeded")
+});
 app.use(require('./src/jwtMiddleware.js'));
 
 
