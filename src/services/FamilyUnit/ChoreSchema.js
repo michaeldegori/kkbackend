@@ -10,7 +10,7 @@ const ChoreSchema = new Schema({
     repetitionRule: {type: String},
     startDate: {type: Number},
     endDate: {type: Number},
-    paused: {type: Boolean}
+    paused: {type: Boolean, default: false}
 });
 
 module.exports = ChoreSchema;
