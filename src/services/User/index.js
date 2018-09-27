@@ -1,17 +1,99 @@
-const UserModelFactory = require('./model.js');
+module.exports = function(app, User, FamilyUnit){
+    /**
+     * Requires following inputs in body:
+     * firstName
+     * lastName
+     * email*
+     * userSubType* enum ['mother', 'father', 'male_guardian', 'female_guardian']
+     */
+    app.post('/user/finishRegistration', async (req, res) => {
+        if (!req.user || !req.user.sub) res.status(400).json({Err: 'no token'});
+        // try to retrieve user from email address in token
+        let queryData = req.query;
+        let currentUser = await User.findOne({auth0: req.user.sub});
+        // if user doesn't exist, create it
+        if (!currentUser) {
+            currentUser = new User({
+                auth0ID: req.user.sub,
+                firstName: queryData.firstName || '',
+                lastName: queryData.lastName || '',
+                email: queryData.email,
+                avatar: "",
+                userType: 'parent',
+                userSubType: queryData.userSubType || 'mother'
+            });
+            await currentUser.save();
+        }
+        // retrieve familyunit for this user
+        let familyUnit = await FamilyUnit.findOne({adminsList: queryData.email});
+        // if familyunit doesnt exist, create it
+        if (!familyUnit) {
+            familyUnit = new FamilyUnit({
+                adminsList: [currentUser.email],
+                kidsList: [],
+                existingChores: [],
+                choreExceptions: [],
+                rewardsList: []
+            });
+            await familyUnit.save();
+        }
 
-module.exports = function(app, db){
-    const User = UserModelFactory(db);
+        // NOTE: if familyunit exists, we might want to
+        // merge creation with existing familyunit
 
-    app.get('/user/finishRegistration', (req, res) => {
+        //send response back with familyunit and userdata
+        let familyAdminPromises = [];
+        if (familyUnit.adminsList.length > 0)
+            familyAdminPromises = familyAdminPromises
+                .concat(
+                    familyUnit.adminsList.map(
+                        parentEmail => User.findOne({email: parentEmail})
+                    )
+                );
 
+        const familyAdmins = await Promise.all(familyAdminPromises);
+
+        res.json({
+            familyUnit: {
+                ...familyUnit,
+                adminsList: familyAdmins
+            },
+            currentUser
+        });
     });
 
     /**
-     * GET user data by id
+     * GET user data by auth0ID
      */
-    app.get('/user/:id', (req, res) => {
+    app.get('/user/:auth0ID', async (req, res) => {
+        if (!req.user || !req.user.sub || req.user.sub !== req.params.auth0ID)
+            res.status(400).json({Err: 'no token'});
 
+        const currentUser = await User.findOne({auth0ID: req.params.auth0ID});
+        if (!currentUser) return res.status(404).json({err: 'User not found'});
+
+        let familyUnit = await FamilyUnit.findOne({adminsList: currentUser.email});
+        if (!familyUnit) return res.status(404).json({err: 'Family Unit not found for user '+req.params.auth0ID});
+
+
+        let familyAdminPromises = [];
+        if (familyUnit.adminsList.length > 0)
+            familyAdminPromises = familyAdminPromises
+                .concat(
+                    familyUnit.adminsList.map(
+                        parentEmail => User.findOne({email: parentEmail})
+                    )
+                );
+
+        const familyAdmins = await Promise.all(familyAdminPromises);
+
+        res.json({
+            familyUnit: {
+                ...familyUnit,
+                adminsList: familyAdmins
+            },
+            currentUser
+        });
     });
 
     /**
