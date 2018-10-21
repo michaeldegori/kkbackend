@@ -6,7 +6,6 @@ const ChoreSchema = new Schema({
     name: {type: String},
     priority: {type: String},
     kkReward: {type: String},
-    duration: {type: String},
     notes: {type: String},
     repetitionRule: {type: String},
     startDate: {type: Number},
@@ -14,4 +13,9 @@ const ChoreSchema = new Schema({
     paused: {type: Boolean, default: false}
 });
 
-module.exports = ChoreSchema;
+
+
+module.exports = {
+    modelFactory: db => db.model('BuiltInChore', ChoreSchema),
+    ChoreSchema
+};

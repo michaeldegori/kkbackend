@@ -11,55 +11,63 @@ module.exports = function(app, User, FamilyUnit){
         // try to retrieve user from email address in token
         let queryData = req.query;
         let currentUser = await User.findOne({auth0: req.user.sub});
-        // if user doesn't exist, create it
-        if (!currentUser) {
-            currentUser = new User({
-                auth0ID: req.user.sub,
-                firstName: queryData.firstName || '',
-                lastName: queryData.lastName || '',
-                email: queryData.email,
-                avatar: "",
-                userType: 'parent',
-                userSubType: queryData.userSubType || 'mother'
+        console.log(req.user);
+        try {
+
+            // if user doesn't exist, create it
+            if (!currentUser) {
+                currentUser = new User({
+                    auth0ID: req.user.sub,
+                    firstName: queryData.firstName || '',
+                    lastName: queryData.lastName || '',
+                    email: queryData.email,
+                    avatar: req.user.picture,
+                    userType: 'parent',
+                    userSubType: queryData.userSubType || 'mother'
+                });
+                await currentUser.save();
+            }
+            // retrieve familyunit for this user
+            let familyUnit = await FamilyUnit.findOne({adminsList: queryData.email});
+            // if familyunit doesnt exist, create it
+            if (!familyUnit) {
+                familyUnit = new FamilyUnit({
+                    adminsList: [currentUser.email],
+                    kidsList: [],
+                    existingChores: [],
+                    choreExceptions: [],
+                    rewardsList: []
+                });
+                await familyUnit.save();
+            }
+
+            // NOTE: if familyunit exists, we might want to
+            // merge creation with existing familyunit
+
+            //send response back with familyunit and userdata
+            let familyAdminPromises = [];
+            if (familyUnit.adminsList.length > 0)
+                familyAdminPromises = familyAdminPromises
+                    .concat(
+                        familyUnit.adminsList.map(
+                            parentEmail => User.findOne({email: parentEmail})
+                        )
+                    );
+
+            const familyAdmins = await Promise.all(familyAdminPromises);
+
+            res.json({
+                familyUnit: {
+                    ...familyUnit.toObject(),
+                    adminsList: familyAdmins
+                },
+                currentUser
             });
-            await currentUser.save();
         }
-        // retrieve familyunit for this user
-        let familyUnit = await FamilyUnit.findOne({adminsList: queryData.email});
-        // if familyunit doesnt exist, create it
-        if (!familyUnit) {
-            familyUnit = new FamilyUnit({
-                adminsList: [currentUser.email],
-                kidsList: [],
-                existingChores: [],
-                choreExceptions: [],
-                rewardsList: []
-            });
-            await familyUnit.save();
+        catch(err){
+            console.log(err);
+            res.json({err: err.message});
         }
-
-        // NOTE: if familyunit exists, we might want to
-        // merge creation with existing familyunit
-
-        //send response back with familyunit and userdata
-        let familyAdminPromises = [];
-        if (familyUnit.adminsList.length > 0)
-            familyAdminPromises = familyAdminPromises
-                .concat(
-                    familyUnit.adminsList.map(
-                        parentEmail => User.findOne({email: parentEmail})
-                    )
-                );
-
-        const familyAdmins = await Promise.all(familyAdminPromises);
-
-        res.json({
-            familyUnit: {
-                ...familyUnit,
-                adminsList: familyAdmins
-            },
-            currentUser
-        });
     });
 
     /**

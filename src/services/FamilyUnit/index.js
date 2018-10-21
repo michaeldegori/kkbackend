@@ -1,71 +1,178 @@
-module.exports = function(app, User, FamilyUnit){
+const {isValidChore}  = require("../DefaultChore");
+const {RRule} = require('rrule');
+const {Types: {ObjectId}} = require('mongoose');
+
+module.exports = function(app, User, FamilyUnit, Chore, Reward){
     /**
      * Get family unit pertaining to user id of main logged in user,
      * including chores and rewards available
      */
     app.get('/familyunit/', async (req, res) => {
         if (!req.user || !req.user.sub) res.status(400).json({Err: 'no token'});
-        let currentUser = await User.findOne({auth0: req.user.sub});
-        if (!currentUser) return res.status(400).json({message: "Incorrect user token"});
+        try{
+            let currentUser = await User.findOne({auth0ID: req.user.sub});
+            if (!currentUser) return res.status(400).json({message: "Incorrect user token"});
 
-        const familyUnit = await FamilyUnit.findOne({adminsList: currentUser.email});
-        let familyAdminPromises = [];
-        if (familyUnit.adminsList.length > 0)
-            familyAdminPromises = familyAdminPromises
-                .concat(
-                    familyUnit.adminsList.map(
-                        parentEmail => User.findOne({email: parentEmail})
-                    )
-                );
+            const familyUnit = await FamilyUnit.findOne({adminsList: currentUser.email});
+            let familyAdminPromises = [];
+            if (familyUnit.adminsList.length > 0)
+                familyAdminPromises = familyAdminPromises
+                    .concat(
+                        familyUnit.adminsList.map(
+                            parentEmail => User.findOne({email: parentEmail})
+                        )
+                    );
 
-        const familyAdmins = await Promise.all(familyAdminPromises);
+            const familyAdmins = await Promise.all(familyAdminPromises);
+            const familyUnitObj = familyUnit.toObject();
 
-        res.json({
-            familyUnit: {
-                ...familyUnit,
-                adminsList: familyAdmins
-            },
-            currentUser
-        });
+            res.json({
+                familyUnit: {
+                    ...familyUnitObj,
+                    adminsList: familyAdmins
+                },
+                currentUser
+            });
+        }
+        catch(err){
+            console.log(err);
+            res.json({err: err.message});
+        }
+
+
     });
 
     /**
      * create chore
-     *   name: {type: String},
-         priority: {type: String},
-         kkReward: {type: String},
-         duration: {type: String},
-         notes: {type: String},
-         repetitionRule: {type: String},
-         startDate: {type: Number},
-         endDate: {type: Number},
-         paused: {type: Boolean}
+     *
      */
-    app.post('/familyunit/:unitid/createchore', async (req, res) => {
+    app.post('/familyunit/:unitid/chore', async (req, res) => {
         const choreData = req.body;
         if (!isValidChore(choreData)) return res.status(400).json({message: "Invalid chore data"});
         const familyUnit = await FamilyUnit.findOne({_id: req.params.unitid});
         if (!familyUnit) return res.status(404).json({message: "familyUnit not found"});
 
-        familyUnit.existingChores.push(choreData);
+        const rruleConfig = {
+            freq: RRule[req.body.freq],
+            interval: 1,
+            byweekday: req.body.weekdays.map(day => RRule[day]),
+            dtstart: new Date(),
+            until: new Date(Date.UTC(2100, 12, 31))
+        };
+        if (rruleConfig.freq === RRule.MONTHLY){
+            rruleConfig.bysetpos = choreData.monthlyChoreInterval || 1;
+        }
+        const newChore = new Chore({
+            _id: new ObjectId(),
+            name: req.body.name,
+            priority: req.body.priority,
+            kkReward: req.body.kkReward,
+            notes: req.body.notes,
+            repetitionRule: new RRule(rruleConfig),
+            startDate: new Date().getTime(),
+            endDate: 4105161000000,
+            paused: false
+        });
+
+        familyUnit.existingChores.push(newChore);
+        //need to add the chores to the kids too
+        if (choreData.choreAppliedTo && choreData.choreAppliedTo.length > 0) {
+            familyUnit.kidsList.forEach(kid => {
+                if (choreData.choreAppliedTo.includes(kid._id.toString())){
+                    kid.assignedChores.push(newChore._id);
+                }
+            })
+        }
+
         const saveResult = await familyUnit.save();
+        console.log(saveResult);
+        res.json(saveResult);
+    });
+
+    /**
+     * update chore
+     *
+     */
+    app.put('/familyunit/:unitid/chore/:choreid', async (req, res) => {
+        const choreData = req.body;
+        if (!isValidChore(choreData)) return res.status(400).json({message: "Invalid chore data"});
+        const familyUnit = await FamilyUnit.findOne({_id: req.params.unitid});
+        if (!familyUnit) return res.status(404).json({message: "familyUnit not found"});
+
+
+        let oldChoreObject = familyUnit.existingChores.find(chore => chore._id.toString() === req.params.choreid);
+
+        const rruleConfig = {
+            freq: RRule[req.body.freq],
+            interval: 1,
+            byweekday: req.body.weekdays.map(day => RRule[day]),
+            dtstart: new Date(oldChoreObject.startDate),
+            until: new Date(Date.UTC(2100, 12, 31))
+        };
+        if (rruleConfig.freq === RRule.MONTHLY){
+            rruleConfig.bysetpos = choreData.monthlyChoreInterval || 1;
+        }
+        const newChore = new Chore({
+            _id: oldChoreObject._id,
+            name: req.body.name,
+            priority: req.body.priority,
+            kkReward: req.body.kkReward || oldChoreObject.kkReward,
+            notes: req.body.notes || oldChoreObject.notes,
+            repetitionRule: new RRule(rruleConfig),
+            startDate: oldChoreObject.startDate,
+            endDate: 4105161000000,
+            paused: req.body.paused || oldChoreObject.paused
+        });
+        oldChoreObject.name = req.body.name || oldChoreObject.name;
+        oldChoreObject.priority = req.body.priority || oldChoreObject.priority;
+        oldChoreObject.kkReward = req.body.kkReward || oldChoreObject.kkReward;
+        oldChoreObject.notes = req.body.notes || oldChoreObject.notes;
+        oldChoreObject.paused = req.body.paused || oldChoreObject.paused;
+        oldChoreObject.startDate = oldChoreObject.startDate;
+        oldChoreObject.repetitionRule = new RRule(rruleConfig);
+
+        //need to add the chores to the kids too
+        if (choreData.choreAppliedTo && choreData.choreAppliedTo.length > 0) {
+            familyUnit.kidsList.forEach(kid => {
+                kid.assignedChores = kid.assignedChores.filter(choreId => choreId !== oldChoreObject._id.toString());
+                if (choreData.choreAppliedTo.includes(kid._id.toString()) ){
+                    kid.assignedChores.push(newChore._id);
+                } //deleting and re-adding is simpler than conditionally adding
+            })
+        }
+
+        const saveResult = await familyUnit.save();
+        console.log(saveResult);
         res.json(saveResult);
     });
 
     /**
      * create reward
      * name
-     * duration
      * kkCost
+     * rewardAppliesTo
      */
-    app.post('/familyunit/:unitid/createreward', async (req, res) => {
+    app.post('/familyunit/:unitid/reward', async (req, res) => {
         const rewardData = req.body;
         if (!isValidReward(rewardData)) return res.status(400).json({message: "Invalid reward data"});
 
         const familyUnit = await FamilyUnit.findOne({_id: req.params.unitid});
         if (!familyUnit) return res.status(404).json({message: "familyUnit not found"});
 
-        familyUnit.existingRewards.push(rewardData);
+        const newReward = new Reward({
+            _id: new ObjectId(),
+            ...rewardData
+        });
+        familyUnit.existingRewards.push(newReward);
+
+        if (rewardData.rewardAppliesTo && rewardData.rewardAppliesTo.length > 0) {
+            familyUnit.kidsList.forEach(kid => {
+                if (rewardData.rewardAppliesTo.includes(kid._id.toString()) ){
+                    kid.eligibleRewards.push(newReward._id);
+                }
+            })
+        }
+
         const saveResult = await familyUnit.save();
         res.json(saveResult);
     });
@@ -90,7 +197,7 @@ module.exports = function(app, User, FamilyUnit){
         const familyUnit = await FamilyUnit.findOne({_id: req.params.unitid});
         if (!familyUnit) return res.status(404).json({message: "familyUnit not found"});
 
-        familyUnit.kidsList.push({
+        const newKid = {
             ...childData,
             kiddieKash: 0,
             assignedChores: [],
@@ -98,29 +205,23 @@ module.exports = function(app, User, FamilyUnit){
             rewardsRedemptions: [],
             doneChores: [],
             delinquentChoreInstances: []
-        });
+        };
+        familyUnit.kidsList.push(newKid);
+
         const saveResult = await familyUnit.save();
-        res.json(saveResult);
+        console.log('####saveresult', saveResult);
+        res.json({
+            ...saveResult,
+            newKid: saveResult.kidsList[saveResult.kidsList.length-1]
+        });
     });
 };
 
-function isValidChore(choreData){
-    const {name, priority, kkReward,
-        duration, notes, repetitionRule,
-        startDate, endDate} = choreData;
-    return name && typeof priority !== 'undefined' &&
-        typeof duration !== 'undefined' &&
-        typeof notes !== 'undefined' &&
-        typeof kkReward !== 'undefined' &&
-        typeof repetitionRule !== 'undefined' &&
-        typeof startDate !== 'undefined' &&
-        typeof endDate !== 'undefined';
-}
+
 
 function isValidReward(rewardData){
-    const {name, duration, kkCost} = rewardData;
+    const {name, kkCost} = rewardData;
     return typeof name !== 'undefined' &&
-        typeof duration !== 'undefined' &&
         typeof kkCost !== 'undefined';
 }
 

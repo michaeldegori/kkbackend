@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const {Schema} = mongoose;
-const ChoreSchema = require('./ChoreSchema');
-const RewardSchema = require('./RewardSchema');
+const {ChoreSchema} = require('../DefaultChore/model');
+const {RewardSchema} = require('../DefaultReward/model');
 
 const KidInfoSchema = new Schema({
     name: {type: String},
