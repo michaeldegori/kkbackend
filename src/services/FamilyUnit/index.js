@@ -7,7 +7,7 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward){
      * Get family unit pertaining to user id of main logged in user,
      * including chores and rewards available
      */
-    app.get('/familyunit/', async (req, res) => {
+    app.get('/familyunit', async (req, res) => {
         if (!req.user || !req.user.sub) res.status(400).json({Err: 'no token'});
         try{
             let currentUser = await User.findOne({auth0ID: req.user.sub});
