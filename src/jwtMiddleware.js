@@ -9,7 +9,8 @@ const jwtValidationMiddleware = jwt({
 });
 
 const openPaths = [
-    "/healthcheck"
+    "/healthcheck",
+    "/favicon.ico"
 ];
 
 
