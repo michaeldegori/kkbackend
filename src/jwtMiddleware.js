@@ -8,4 +8,14 @@ const jwtValidationMiddleware = jwt({
     algorithms: [ 'RS256', 'RS512' ]
 });
 
-module.exports = jwtValidationMiddleware;
+const openPaths = [
+    "/healthcheck"
+]
+
+
+module.exports = function(req, res, next) {
+    if (openPaths.indexOf(req.originalUrl) !== -1 ){
+        return next();
+    }
+    jwtValidationMiddleware(req,res,next);
+};
