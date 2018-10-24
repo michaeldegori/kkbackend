@@ -1,5 +1,5 @@
 const {RRule} = require('rrule');
-
+const mongoose = require('mongoose');
 
 exports.routeFactory = async function(app, User, Chore){
     app.get('/defaultchores', async (req, res) => {
@@ -12,6 +12,7 @@ exports.routeFactory = async function(app, User, Chore){
     if (c) return;
 
     c = new Chore({
+        _id: new mongoose.Schema.ObjectId('5bb6f007c4e3fb21080f63b9'),
         name: "Sample Built in Chore 1",
         priority: 4,
         kkReward: 50,

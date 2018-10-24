@@ -11,7 +11,7 @@ module.exports = function(app, User, FamilyUnit){
         // try to retrieve user from email address in token
         let queryData = req.query;
         let currentUser = await User.findOne({auth0ID: req.user.sub});
-        console.log('USER DECODED FROM JWT:',req.user, 'USER FROM DB:', currentUser);
+        console.log('USER DECODED FROM JWT:',req.user, '\nUSER FROM DB:', currentUser);
         try {
 
             // if user doesn't exist, create it
