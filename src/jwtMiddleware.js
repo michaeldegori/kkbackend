@@ -10,11 +10,12 @@ const jwtValidationMiddleware = jwt({
 
 const openPaths = [
     "/healthcheck"
-]
+];
 
 
 module.exports = function(req, res, next) {
-    if (openPaths.indexOf(req.originalUrl) !== -1 ){
+    if (openPaths.includes(req.originalUrl) ){
+        console.log("Skipping the jwt validation");
         return next();
     }
     jwtValidationMiddleware(req,res,next);
