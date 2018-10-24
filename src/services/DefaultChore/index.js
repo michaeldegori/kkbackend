@@ -12,8 +12,8 @@ exports.routeFactory = async function(app, User, Chore){
     if (c) return;
 
     c = new Chore({
-        _id: new mongoose.Schema.ObjectId('5bb6f007c4e3fb21080f63b9'),
-        name: "Sample Built in Chore 1",
+        _id: new mongoose.Types.ObjectId('5bb6f007c4e3fb21080f63b9'),
+        name: "Go to sleep well",
         priority: 4,
         kkReward: 50,
         notes: "Leverage agile frameworks to provide a robust synopsis for high level overviews.",
