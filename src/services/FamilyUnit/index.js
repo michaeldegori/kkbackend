@@ -134,15 +134,18 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward){
         //need to add the chores to the kids too
         if (choreData.choreAppliedTo && choreData.choreAppliedTo.length > 0) {
             familyUnit.kidsList.forEach(kid => {
+                const oldLEngth = kid.assignedChores.length;
                 kid.assignedChores = kid.assignedChores.filter(choreId => choreId !== oldChoreObject._id.toString());
                 if (choreData.choreAppliedTo.includes(kid._id.toString()) ){
                     kid.assignedChores.push(newChore._id);
                 } //deleting and re-adding is simpler than conditionally adding
+                const newLength = kid.assignedChores.length;
+                console.log('processed put chore', oldLEngth, newLength);
             })
         }
 
         const saveResult = await familyUnit.save();
-        console.log(saveResult);
+        // console.log(saveResult);
         res.json(saveResult);
     });
 
@@ -164,6 +167,37 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward){
             ...rewardData
         });
         familyUnit.existingRewards.push(newReward);
+
+        if (rewardData.rewardAppliesTo && rewardData.rewardAppliesTo.length > 0) {
+            familyUnit.kidsList.forEach(kid => {
+                if (rewardData.rewardAppliesTo.includes(kid._id.toString()) ){
+                    kid.eligibleRewards.push(newReward._id);
+                }
+            })
+        }
+
+        const saveResult = await familyUnit.save();
+        res.json(saveResult);
+    });
+
+    /**
+     * update reward
+     * name
+     * kkCost
+     * rewardAppliesTo
+     */
+    app.put('/familyunit/:unitid/reward/:rewardid', async (req, res) => {
+        const rewardData = req.body;
+        if (!isValidReward(rewardData)) return res.status(400).json({message: "Invalid reward data"});
+
+        const familyUnit = await FamilyUnit.findOne({_id: req.params.unitid});
+        if (!familyUnit) return res.status(404).json({message: "familyUnit not found"});
+
+
+        familyUnit.existingRewards = familyUnit.existingRewards.map(curReward => {
+            if (curReward._id.toString() !== req.params.rewardid) return curReward;
+            return Object.assign(curReward, rewardData);
+        });
 
         if (rewardData.rewardAppliesTo && rewardData.rewardAppliesTo.length > 0) {
             familyUnit.kidsList.forEach(kid => {
