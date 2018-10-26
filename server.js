@@ -15,13 +15,13 @@ const Reward = require('./src/services/DefaultReward/model').modelFactory(db);
 
 //middlewares and health check
 app.use(cors());
+app.use(bp.json());
 app.use(function(req, res, next){
     console.log(`${req.method} ${req.originalUrl} - Authorization: ${!!req.get('Authorization')}`);
     console.log('Query', req.query);
     console.log('Body', req.body);
     next();
 });
-app.use(bp.json());
 app.get('/healthcheck', (req, res) => {
     console.log('received health check');
     res.end("health check succeeded");
