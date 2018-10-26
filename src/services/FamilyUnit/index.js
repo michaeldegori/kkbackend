@@ -132,7 +132,7 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward){
         oldChoreObject.repetitionRule = new RRule(rruleConfig);
 
         //need to add the chores to the kids too
-        if (choreData.choreAppliedTo && choreData.choreAppliedTo.length > 0) {
+        if (choreData.choreAppliedTo ) {
             familyUnit.kidsList.forEach(kid => {
                 const oldLEngth = kid.assignedChores.length;
                 kid.assignedChores = kid.assignedChores.filter(choreId => choreId !== oldChoreObject._id.toString());
@@ -168,7 +168,7 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward){
         });
         familyUnit.existingRewards.push(newReward);
 
-        if (rewardData.rewardAppliesTo && rewardData.rewardAppliesTo.length > 0) {
+        if (rewardData.rewardAppliesTo) {
             familyUnit.kidsList.forEach(kid => {
                 if (rewardData.rewardAppliesTo.includes(kid._id.toString()) ){
                     kid.eligibleRewards.push(newReward._id);
