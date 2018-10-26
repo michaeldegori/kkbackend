@@ -193,17 +193,19 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward){
         const familyUnit = await FamilyUnit.findOne({_id: req.params.unitid});
         if (!familyUnit) return res.status(404).json({message: "familyUnit not found"});
 
+        let rewardBeingEdited;
 
         familyUnit.existingRewards = familyUnit.existingRewards.map(curReward => {
             if (curReward._id.toString() !== req.params.rewardid) return curReward;
+            rewardBeingEdited = curReward;
             return Object.assign(curReward, rewardData);
         });
 
         if (rewardData.rewardAppliesTo) {
             familyUnit.kidsList.forEach(kid => {
-                familyUnit.kidsList.eligibleRewards = familyUnit.kidsList.eligibleRewards.filter(rewardId => rewardId.toString() !== req.params.rewardid);
+                kid.eligibleRewards = kid.eligibleRewards.filter(rewardId => rewardId.toString() !== req.params.rewardid);
                 if (rewardData.rewardAppliesTo.includes(kid._id.toString()) ){
-                    kid.eligibleRewards.push(newReward._id);
+                    kid.eligibleRewards.push(rewardBeingEdited._id);
                 }
             })
         }
