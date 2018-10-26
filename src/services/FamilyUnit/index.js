@@ -135,7 +135,7 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward){
         if (choreData.choreAppliedTo ) {
             familyUnit.kidsList.forEach(kid => {
                 const oldLEngth = kid.assignedChores.length;
-                kid.assignedChores = kid.assignedChores.filter(choreId => choreId !== oldChoreObject._id.toString());
+                kid.assignedChores = kid.assignedChores.filter(choreId => choreId.toString() !== req.params.choreid);
                 if (choreData.choreAppliedTo.includes(kid._id.toString()) ){
                     kid.assignedChores.push(newChore._id);
                 } //deleting and re-adding is simpler than conditionally adding
@@ -168,7 +168,7 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward){
         });
         familyUnit.existingRewards.push(newReward);
 
-        if (rewardData.rewardAppliesTo) {
+        if (rewardData.rewardAppliesTo && rewardData.rewardAppliesTo.length > 0) {
             familyUnit.kidsList.forEach(kid => {
                 if (rewardData.rewardAppliesTo.includes(kid._id.toString()) ){
                     kid.eligibleRewards.push(newReward._id);
@@ -199,8 +199,9 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward){
             return Object.assign(curReward, rewardData);
         });
 
-        if (rewardData.rewardAppliesTo && rewardData.rewardAppliesTo.length > 0) {
+        if (rewardData.rewardAppliesTo) {
             familyUnit.kidsList.forEach(kid => {
+                familyUnit.kidsList.eligibleRewards = familyUnit.kidsList.eligibleRewards.filter(rewardId => rewardId.toString() !== req.params.rewardid);
                 if (rewardData.rewardAppliesTo.includes(kid._id.toString()) ){
                     kid.eligibleRewards.push(newReward._id);
                 }
