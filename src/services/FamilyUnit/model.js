@@ -12,7 +12,9 @@ const KidInfoSchema = new Schema({
     eligibleRewards: [{type: Schema.Types.ObjectId}],
     rewardsRedemptions: [Schema.Types.Mixed],
     doneChores: [Schema.Types.ObjectId],
-    delinquentChoreInstances: [Schema.Types.Mixed]
+    delinquentChoreInstances: [Schema.Types.Mixed],
+    allowanceAmount: {type: Number, default: () => 0},
+    savingsRequired: {type: Number, default: () => 0}
 });
 
 const FamilyUnitSchema = new Schema({
