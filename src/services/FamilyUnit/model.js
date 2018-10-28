@@ -3,6 +3,14 @@ const {Schema} = mongoose;
 const {ChoreSchema} = require('../DefaultChore/model');
 const {RewardSchema} = require('../DefaultReward/model');
 
+const oneYear = 1000 * 60 * 60 * 24 * 365;
+const getDOB = dobStr => {
+    const [month, day, year] = dobStr.split("-");
+    const d = new Date(dobStr);
+    d.setDate(day);
+    return d;
+}
+
 const KidInfoSchema = new Schema({
     name: {type: String},
     dob: {type: String},
@@ -13,8 +21,8 @@ const KidInfoSchema = new Schema({
     rewardsRedemptions: [Schema.Types.Mixed],
     doneChores: [Schema.Types.ObjectId],
     delinquentChoreInstances: [Schema.Types.Mixed],
-    allowanceAmount: {type: Number, default: () => 0},
-    savingsRequired: {type: Number, default: () => 0}
+    allowanceAmount: {type: Number, default: () => Math.round((new Date().getTime() - getDOB(this.dob))/oneYear)},
+    savingsRequired: {type: Number, default: () => Math.round((new Date().getTime() - getDOB(this.dob))/oneYear)},
 });
 
 const FamilyUnitSchema = new Schema({
