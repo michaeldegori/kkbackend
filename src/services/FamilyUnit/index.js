@@ -253,6 +253,9 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward){
         });
     });
 
+    /**
+     * Patch child settings
+     */
     app.patch('/familyunit/:unitid/child/:childid', async (req, res) => {
         const childData = req.body;
         if (typeof childData.allowanceAmount !== 'number' && typeof childData.savingsRequired !== 'number')
