@@ -241,7 +241,9 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward){
             eligibleRewards: [],
             rewardsRedemptions: [],
             doneChores: [],
-            delinquentChoreInstances: []
+            delinquentChoreInstances: [],
+            allowanceAmount: Math.round((new Date().getTime() - getDOB(childData.dob))/oneYear),
+            savingsRequired: Math.round((new Date().getTime() - getDOB(childData.dob))/oneYear)
         };
 
         if (!familyUnit.kidsList) familyUnit.kidsList = [];
@@ -286,4 +288,12 @@ function isValidReward(rewardData){
 function isValidChild(child){
     const {name, dob, gender} = child;
     return !!name && !!dob && !!gender;
+}
+
+const oneYear = 1000 * 60 * 60 * 24 * 365;
+function getDOB(dobStr) {
+    const [month, day, year] = dobStr.split("-");
+    const d = new Date(dobStr);
+    d.setDate(day);
+    return d.getTime();
 }
