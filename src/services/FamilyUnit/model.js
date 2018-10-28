@@ -8,7 +8,7 @@ const getDOB = dobStr => {
     const [month, day, year] = dobStr.split("-");
     const d = new Date(dobStr);
     d.setDate(day);
-    return d;
+    return d.getTime();
 }
 
 const KidInfoSchema = new Schema({
@@ -24,6 +24,7 @@ const KidInfoSchema = new Schema({
     allowanceAmount: {
         type: Number,
         default: function(){
+            console.log(this);
             return Math.round((new Date().getTime() - getDOB(this.dob))/oneYear)
         }
     },
