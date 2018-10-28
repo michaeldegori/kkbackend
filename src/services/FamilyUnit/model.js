@@ -16,12 +16,7 @@ const KidInfoSchema = new Schema({
     doneChores: [Schema.Types.ObjectId],
     delinquentChoreInstances: [Schema.Types.Mixed],
     allowanceAmount: {type: Number},
-    savingsRequired: {
-        type: Number,
-        default: function(){
-            return Math.round((new Date().getTime() - getDOB(this.dob))/oneYear)
-        }
-    }
+    savingsRequired: {type: Number},
 });
 
 const FamilyUnitSchema = new Schema({
