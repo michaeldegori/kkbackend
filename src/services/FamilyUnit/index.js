@@ -243,11 +243,8 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward){
             doneChores: [],
             delinquentChoreInstances: []
         };
-        console.log("About to push kid to family unit");
-        console.log(newKid)
-        console.log("######################");
-        console.log(familyUnit);
-        
+
+        if (!familyUnit.kidsList) familyUnit.kidsList = [];
         familyUnit.kidsList.push(newKid);
 
         const saveResult = await familyUnit.save();
