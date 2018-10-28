@@ -265,7 +265,7 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward){
         if (!familyUnit) return res.status(404).json({message: "familyUnit not found"});
 
         let kidIndex = familyUnit.kidsList.findIndex(kid => kid._id.toString() === req.params.childid);
-        if (kid === -1) return res.status(404).json({message: "kid not found in family unit"});
+        if (kidIndex === -1) return res.status(404).json({message: "kid not found in family unit"});
 
         familyUnit.kidsList[kidIndex] = Object.assign(familyUnit.kidsList[kidIndex], req.body);
         const saveResult = await familyUnit.save();
