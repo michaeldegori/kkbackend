@@ -252,6 +252,22 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward){
             newKid: saveResult.kidsList[saveResult.kidsList.length-1]
         });
     });
+
+    app.patch('/familyunit/:unitid/child/:childid', async (req, res) => {
+        const childData = req.body;
+        if (typeof childData.allowanceAmount !== 'number' && typeof childData.savingsRequired !== 'number')
+            return res.status(400).json({message: "Invalid child data"});
+
+        const familyUnit = await FamilyUnit.findOne({_id: req.params.unitid});
+        if (!familyUnit) return res.status(404).json({message: "familyUnit not found"});
+
+        let kidIndex = familyUnit.kidsList.findIndex(kid => kid._id.toString() === req.params.childid);
+        if (kid === -1) return res.status(404).json({message: "kid not found in family unit"});
+
+        familyUnit.kidsList[kidIndex] = Object.assign(familyUnit.kidsList[kidIndex], req.body);
+        const saveResult = await familyUnit.save();
+        res.json(saveResult);
+    });
 };
 
 
