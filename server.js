@@ -12,6 +12,7 @@ const User = require('./src/services/User/model.js')(db);
 const FamilyUnit = require('./src/services/FamilyUnit/model.js')(db);
 const Chore = require('./src/services/DefaultChore/model').modelFactory(db);
 const Reward = require('./src/services/DefaultReward/model').modelFactory(db);
+const Alert = require('./src/services/FamilyUnit/Alert/model').modelFactory(db);
 
 //middlewares and health check
 app.use(cors());
@@ -33,6 +34,7 @@ require('./src/services/User')(app, User, FamilyUnit);
 require('./src/services/FamilyUnit')(app, User, FamilyUnit, Chore, Reward);
 require('./src/services/DefaultChore').routeFactory(app, User, Chore);
 require('./src/services/DefaultReward').routeFactory(app, User, Reward);
+require('./src/services/FamilyUnit/Alert').routeFactory(app, User, FamilyUnit, Alert);
 
 
 app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));

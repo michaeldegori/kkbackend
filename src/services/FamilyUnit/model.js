@@ -13,7 +13,7 @@ const KidInfoSchema = new Schema({
     assignedChores: [{type: Schema.Types.ObjectId}],
     eligibleRewards: [{type: Schema.Types.ObjectId}],
     rewardsRedemptions: [Schema.Types.Mixed],
-    doneChores: [Schema.Types.ObjectId],
+    doneChores: [Schema.Types.Mixed],
     delinquentChoreInstances: [Schema.Types.Mixed],
     allowanceAmount: {type: Number},
     savingsRequired: {type: Number},
