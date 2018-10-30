@@ -4,10 +4,10 @@ exports.routeFactory = async function (app, User, FamilyUnit, Alert){
     app.get('/familyunit/:unitid/alerts', async (req, res) => {
         if (!req.user || !req.user.sub) return res.status(400).json({Err: 'no token'});
         try {
-            let [currentUser, familyUnit] = await Promise.all(
+            let [currentUser, familyUnit] = await Promise.all([
                 User.findOne({auth0ID: req.user.sub}),
                 FamilyUnit.findOne({_id: req.params.unitid})
-            );
+            ]);
             if (!currentUser) return res.status(400).json({message: "Incorrect user token"});
             if (!familyUnit) return res.status(404).json({message: "familyUnit not found"});
             if (!familyUnit.adminsList.includes(currentUser.email))
@@ -30,10 +30,10 @@ exports.routeFactory = async function (app, User, FamilyUnit, Alert){
         if (!kid || !chore) return res.status(400).json({Err: 'missing kid or chore'});
 
         try {
-            let [currentUser, familyUnit] = await Promise.all(
+            let [currentUser, familyUnit] = await Promise.all([
                 User.findOne({auth0ID: req.user.sub}),
                 FamilyUnit.findOne({_id: req.params.unitid})
-            );
+            ]);
             if (!currentUser) return res.status(400).json({message: "Incorrect user token"});
             if (!familyUnit) return res.status(404).json({message: "familyUnit not found"});
             if (!familyUnit.adminsList.includes(currentUser.email))
@@ -44,7 +44,7 @@ exports.routeFactory = async function (app, User, FamilyUnit, Alert){
                 familyUnit: familyUnit._id,
                 timeStamp: new Date().getTime()
             });
-            const saveResult = alert.save();
+            const saveResult = await alert.save();
             res.json(saveResult);
         }
         catch(err){
