@@ -1,34 +1,62 @@
 const {RRule} = require('rrule');
 const mongoose = require('mongoose');
 
-exports.routeFactory = async function(app, User, Chore){
+const defaultChoreInfo = [
+    ['Put toys away', '4-5'],
+    ['Put clothes in hamper', '4-5'],
+    ['Dust', '4-5'],
+    ['Empty trash', '4-5'],
+    ['Bring in mail', '4-5'],
+    ['Clear table', '4-5'],
+    ['Pull weeds', '4-5'],
+    ['Water flowers', '4-5'],
+    ['Sort laundry', '6-7'],
+    ['Sweep floors', '6-7'],
+    ['Set table', '6-7'],
+    ['Pack lunch', '6-7'],
+    ['Rake leaves', '6-7'],
+    ['Clean room', '6-7'],
+    ['Load dishwasher', '8-9'],
+    ['Put away groceries', '8-9'],
+    ['Vacuum', '8-9'],
+    ['Help make dinner', '8-9'],
+    ['Make own snacks', '8-9'],
+    ['Wash table after meal', '8-9'],
+    ['Put away own laundry', '8-9'],
+    ['Make breakfast', '8-9'],
+    ['Mop floor', '8-9'],
+    ['Unload dishwasher', '10-12'],
+    ['Fold laundry', '10-12'],
+    ['Clean bathroom', '10-12'],
+    ['Wash windows', '10-12'],
+    ['Wash car', '10-12'],
+    ['Cook simple meal', '10-12'],
+    ['Iron clothes', '10-12'],
+    ['Do laundry', '10-12'],
+    ['Babysit', '10-12'],
+    ['Clean kitchen', '10-12'],
+    ['Change bed sheets', '10-12'],
+];
+
+exports.routeFactory = async function(app, User, SuggestedChore){
     app.get('/defaultchores', async (req, res) => {
         const chores = await Chore.find();
         res.json(chores);
     });
 
 
-    let c = await Chore.findOne({_id: '5bb6f007c4e3fb21080f63b9'});
+    let c = await Chore.findOne({_id: '5bb6f007c4e3fb21080f6300'});
     if (c) return;
 
-    c = new Chore({
-        _id: new mongoose.Types.ObjectId('5bb6f007c4e3fb21080f63b9'),
-        name: "Go to sleep well",
-        priority: 4,
-        kkReward: 50,
-        notes: "Leverage agile frameworks to provide a robust synopsis for high level overviews.",
-        repetitionRule: new RRule({
-            freq: RRule.WEEKLY,
-            interval: 1,
-            byweekday: [RRule.MO, RRule.WE , RRule.FR],
-            dtstart: new Date(),
-            until: new Date(Date.UTC(2100, 12, 31))
-        }),
-        startDate: new Date().getTime(),
-        endDate: 4105161000000,
-        paused: false
-    });
-    c.save().then(console.log);
+    let idRoot='5bb6f007c4e3fb21080f63';
+    console.log('Populating default chores...');
+    const defaultChoresToSave = defaultChoreInfo.map((cArr, idx) => new SuggestedChore({
+        _id: new mongoose.Types.ObjectId(`idRoot${("0"+idx).slice(-2)}`),
+        name: cArr[0],
+        ageGroup: cArr[1]
+    }));
+    await Promise.all(defaultChoresToSave);
+    console.log("Saved default chores");
 };
 
 
