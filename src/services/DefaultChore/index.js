@@ -50,11 +50,14 @@ exports.routeFactory = async function(app, User, ChoreSuggestion){
 
     let idRoot='5bb6f007c4e3fb21080f63';
     console.log('Populating default chores...');
-    const defaultChoresToSave = defaultChoreInfo.map((cArr, idx) => new ChoreSuggestion({
-        _id: new mongoose.Types.ObjectId(`idRoot${("0"+idx).slice(-2)}`),
-        name: cArr[0],
-        ageGroup: cArr[1]
-    }));
+    const defaultChoresToSave = defaultChoreInfo.map((cArr, idx) => {
+        console.log(`Saving chore ${idRoot}${("0"+idx).slice(-2)}`);
+        return new ChoreSuggestion({
+            _id: new mongoose.Types.ObjectId(`${idRoot}${("0"+idx).slice(-2)}`),
+            name: cArr[0],
+            ageGroup: cArr[1]
+        }).save()
+    });
     await Promise.all(defaultChoresToSave);
     console.log("Saved default chores");
 };
