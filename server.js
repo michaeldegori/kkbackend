@@ -11,7 +11,7 @@ const cors = require('cors');
 const User = require('./src/services/User/model.js')(db);
 const FamilyUnit = require('./src/services/FamilyUnit/model.js')(db);
 const Chore = require('./src/services/DefaultChore/model').modelFactory(db);
-const SuggestedChore = require('./src/services/DefaultChore/model').suggestionModelFactory(db);
+const ChoreSuggestion = require('./src/services/DefaultChore/model').suggestionModelFactory(db);
 const Reward = require('./src/services/DefaultReward/model').modelFactory(db);
 const Alert = require('./src/services/FamilyUnit/Alert/model').modelFactory(db);
 
@@ -33,7 +33,7 @@ app.use(require('./src/jwtMiddleware.js'));
 //routes
 require('./src/services/User')(app, User, FamilyUnit);
 require('./src/services/FamilyUnit')(app, User, FamilyUnit, Chore, Reward);
-require('./src/services/DefaultChore').routeFactory(app, User, SuggestedChore);
+require('./src/services/DefaultChore').routeFactory(app, User, ChoreSuggestion);
 require('./src/services/DefaultReward').routeFactory(app, User, Reward);
 require('./src/services/FamilyUnit/Alert').routeFactory(app, User, FamilyUnit, Alert);
 

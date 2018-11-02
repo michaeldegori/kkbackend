@@ -22,6 +22,6 @@ const ChoreSuggestionSchema = new Schema({
 
 module.exports = {
     modelFactory: db => db.model('BuiltInChore', ChoreSchema),
-    suggestionModelFactory: db => db.model('BuiltInChore', ChoreSuggestionSchema),
+    suggestionModelFactory: db => db.model('ChoreSuggestion', ChoreSuggestionSchema),
     ChoreSchema
 };

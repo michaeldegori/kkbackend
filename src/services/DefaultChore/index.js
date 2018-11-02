@@ -38,7 +38,7 @@ const defaultChoreInfo = [
     ['Change bed sheets', '10-12'],
 ];
 
-exports.routeFactory = async function(app, User, SuggestedChore){
+exports.routeFactory = async function(app, User, ChoreSuggestion){
     app.get('/defaultchores', async (req, res) => {
         const chores = await Chore.find();
         res.json(chores);
@@ -50,7 +50,7 @@ exports.routeFactory = async function(app, User, SuggestedChore){
 
     let idRoot='5bb6f007c4e3fb21080f63';
     console.log('Populating default chores...');
-    const defaultChoresToSave = defaultChoreInfo.map((cArr, idx) => new SuggestedChore({
+    const defaultChoresToSave = defaultChoreInfo.map((cArr, idx) => new ChoreSuggestion({
         _id: new mongoose.Types.ObjectId(`idRoot${("0"+idx).slice(-2)}`),
         name: cArr[0],
         ageGroup: cArr[1]
