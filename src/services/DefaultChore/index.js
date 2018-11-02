@@ -40,12 +40,12 @@ const defaultChoreInfo = [
 
 exports.routeFactory = async function(app, User, ChoreSuggestion){
     app.get('/defaultchores', async (req, res) => {
-        const chores = await Chore.find();
+        const chores = await ChoreSuggestion.find();
         res.json(chores);
     });
 
 
-    let c = await Chore.findOne({_id: '5bb6f007c4e3fb21080f6300'});
+    let c = await ChoreSuggestion.findOne({_id: '5bb6f007c4e3fb21080f6300'});
     if (c) return;
 
     let idRoot='5bb6f007c4e3fb21080f63';
