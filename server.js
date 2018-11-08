@@ -32,7 +32,7 @@ app.use(require('./src/jwtMiddleware.js'));
 
 //routes
 app.get('/logout', (req, res) => {
-   res.end(`<script></script>`)
+   res.sendFile(__dirname+ '/files/logout.html');
 });
 require('./src/services/User')(app, User, FamilyUnit);
 require('./src/services/FamilyUnit')(app, User, FamilyUnit, Chore, Reward);

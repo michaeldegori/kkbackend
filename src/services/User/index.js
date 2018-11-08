@@ -110,4 +110,9 @@ module.exports = function(app, User, FamilyUnit){
     app.patch('/user/:id', (req, res) => {
 
     });
+
+    app.put('/user/notification-token', (req, res) => {
+        console.log(req.body)
+        res.json({success:true});
+    });
 };
