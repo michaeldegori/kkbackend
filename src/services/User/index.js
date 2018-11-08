@@ -119,11 +119,12 @@ module.exports = function(app, User, FamilyUnit){
         if (!currentUser) return res.status(404).json({err: 'User not found'});
 
         currentUser.pushNotificationInformation = {
-            ...currentUser.pushNotificationInformation,
+            ...(currentUser.pushNotificationInformation || {}),
             expo: req.body.token
         };
-        await currentUser.save();
-        
+        const saveResult = await currentUser.save();
+        console.log(saveResult);
+
         res.json({success:true});
     });
 };
