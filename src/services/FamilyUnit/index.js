@@ -293,7 +293,7 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward){
         familyUnit.kidsList[kidIndex] = Object.assign(familyUnit.kidsList[kidIndex], {
             doneChores: [
                 ...familyUnit.kidsList[kidIndex].doneChores,
-                {id: choreId, approved: false}
+                {id: choreId, status: "unapproved"}
             ]
         });
         const saveResult = await familyUnit.save();

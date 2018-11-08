@@ -31,6 +31,9 @@ app.get('/healthcheck', (req, res) => {
 app.use(require('./src/jwtMiddleware.js'));
 
 //routes
+app.get('/logout', (req, res) => {
+   res.end(`<script></script>`)
+});
 require('./src/services/User')(app, User, FamilyUnit);
 require('./src/services/FamilyUnit')(app, User, FamilyUnit, Chore, Reward);
 require('./src/services/DefaultChore').routeFactory(app, User, ChoreSuggestion);
