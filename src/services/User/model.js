@@ -10,7 +10,8 @@ const UserSchema = new Schema({
     avatar: {type: String},
     userType: {type: String, enum: ['parent', 'admin']},
     userSubType: {type: String, enum: ['mother', 'father', 'male_guardian', 'female_guardian']},
-    parentInfo: {type: Schema.Types.Mixed}, //anything that might be specific to parent, like maybe app settings
+    parentInfo: {type: Schema.Types.Mixed}, //anything that might be specific to parent, like maybe app settings,
+    pushNotificationInformation: {type: Schema.Types.Mixed} //i want this to support expo, gcm and apns
 });
 
 module.exports = function(db){

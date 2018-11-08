@@ -111,8 +111,19 @@ module.exports = function(app, User, FamilyUnit){
 
     });
 
-    app.put('/user/notification-token', (req, res) => {
-        console.log(req.body)
+    app.put('/user/notification-token', async (req, res) => {
+        if (!req.user || !req.user.sub || !req.body.token)
+            res.status(400).json({Err: 'no id token or no push token submitted'});
+
+        const currentUser = await User.findOne({auth0ID: req.params.auth0ID});
+        if (!currentUser) return res.status(404).json({err: 'User not found'});
+
+        currentUser.pushNotificationInformation = {
+            ...currentUser.pushNotificationInformation,
+            expo: req.body.token
+        };
+        await currentUser.save();
+        
         res.json({success:true});
     });
 };
