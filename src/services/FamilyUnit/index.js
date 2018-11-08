@@ -275,6 +275,30 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward){
         const saveResult = await familyUnit.save();
         res.json(saveResult);
     });
+
+    /**
+     * Request Complete chore
+     */
+    app.patch('/familyunit/:unitid/child/:childid/requestcompletechore', async (req, res) => {
+        const {choreId} = req.body;
+        if (typeof choreId === 'undefined')
+            return res.status(400).json({message: "Invalid chore data"});
+
+        const familyUnit = await FamilyUnit.findOne({_id: req.params.unitid});
+        if (!familyUnit) return res.status(404).json({message: "familyUnit not found"});
+
+        let kidIndex = familyUnit.kidsList.findIndex(kid => kid._id.toString() === req.params.childid);
+        if (kidIndex === -1) return res.status(404).json({message: "kid not found in family unit"});
+
+        familyUnit.kidsList[kidIndex] = Object.assign(familyUnit.kidsList[kidIndex], {
+            doneChores: [
+                ...familyUnit.kidsList[kidIndex].doneChores,
+                {id: choreId, approved: false}
+            ]
+        });
+        const saveResult = await familyUnit.save();
+        res.json(saveResult);
+    });
 };
 
 
