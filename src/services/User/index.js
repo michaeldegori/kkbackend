@@ -120,12 +120,12 @@ module.exports = function(app, User, FamilyUnit){
 
         let currentExpoNotifications = (currentUser.pushNotificationInformation || {}).expo;
         if (!currentExpoNotifications) currentExpoNotifications = [];
+        let nextPushNotifications = currentExpoNotifications.filter(notObj => notObj.token !== req.body.token);
+        nextPushNotifications.push(req.body);
 
         currentUser.pushNotificationInformation = {
             ...(currentUser.pushNotificationInformation || {}),
-            expo: currentExpoNotifications.concat({
-                ...req.body
-            })
+            expo: nextPushNotifications
         };
         const saveResult = await currentUser.save();
         console.log(saveResult);
