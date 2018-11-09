@@ -115,7 +115,7 @@ module.exports = function(app, User, FamilyUnit){
         if (!req.user || !req.user.sub || !req.body.token)
             res.status(400).json({Err: 'no id token or no push token submitted'});
 
-        const currentUser = await User.findOne({auth0ID: req.params.auth0ID});
+        const currentUser = await User.findOne({auth0ID: req.user.sub});
         if (!currentUser) return res.status(404).json({err: 'User not found'});
 
         currentUser.pushNotificationInformation = {
