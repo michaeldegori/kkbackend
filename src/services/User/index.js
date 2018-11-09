@@ -118,9 +118,14 @@ module.exports = function(app, User, FamilyUnit){
         const currentUser = await User.findOne({auth0ID: req.user.sub});
         if (!currentUser) return res.status(404).json({err: 'User not found'});
 
+        let currentExpoNotifications = (currentUser.pushNotificationInformation || {}).expo;
+        if (!currentExpoNotifications) currentExpoNotifications = [];
+
         currentUser.pushNotificationInformation = {
             ...(currentUser.pushNotificationInformation || {}),
-            expo: req.body.token
+            expo: currentExpoNotifications.concat({
+                ...req.body
+            })
         };
         const saveResult = await currentUser.save();
         console.log(saveResult);
