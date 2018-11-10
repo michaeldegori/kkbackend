@@ -8,7 +8,7 @@ const AlertSchema = new Schema({
     timeStamp: Number,
     customNote: String,
     isTappable: Boolean,
-    recipient: {type: String, enum: ['parent', 'kid']}
+    status: {type: String, enum:["new", "processed"]}
 });
 
 module.exports = {

@@ -79,7 +79,7 @@ exports.routeFactory = async function (app, User, FamilyUnit, Alert){
             timeStamp: new Date().getTime()-60*15*1000,
             customNote: "This is a custom note",
             isTappable: false,
-            recipient: 'parent'
+            status: "new"
         });
         a1.save().then(console.log);
 
@@ -91,7 +91,7 @@ exports.routeFactory = async function (app, User, FamilyUnit, Alert){
             timeStamp: new Date().getTime(),
             customNote: "This is a custom note",
             isTappable: false,
-            recipient: 'parent'
+            status: "new"
         });
         a2.save().then(console.log);
     }
@@ -105,7 +105,7 @@ exports.routeFactory = async function (app, User, FamilyUnit, Alert){
             timeStamp: new Date().getTime()-60*15*1000,
             customNote: "This is a custom note",
             isTappable: false,
-            recipient: 'parent'
+            status: "new"
         });
         a3.save().then(console.log);
 
@@ -117,7 +117,7 @@ exports.routeFactory = async function (app, User, FamilyUnit, Alert){
             timeStamp: new Date().getTime(),
             customNote: "This is a custom note",
             isTappable: false,
-            recipient: 'parent'
+            status: "new"
         });
         a4.save().then(console.log);
     }
