@@ -6,7 +6,9 @@ const AlertSchema = new Schema({
     kid: {type: Schema.Types.ObjectId},
     chore: {type: Schema.Types.ObjectId},
     timeStamp: Number,
-    customNote: String
+    customNote: String,
+    isTappable: Boolean,
+    recipient: {type: String, enum: ['parent', 'kid']}
 });
 
 module.exports = {

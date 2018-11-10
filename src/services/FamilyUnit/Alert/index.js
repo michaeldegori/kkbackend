@@ -77,7 +77,9 @@ exports.routeFactory = async function (app, User, FamilyUnit, Alert){
             kid: getFirstKid(unit1),
             chore: getFirstChore(unit1),
             timeStamp: new Date().getTime()-60*15*1000,
-            customNote: "This is a custom note"
+            customNote: "This is a custom note",
+            isTappable: false,
+            recipient: 'parent'
         });
         a1.save().then(console.log);
 
@@ -87,7 +89,9 @@ exports.routeFactory = async function (app, User, FamilyUnit, Alert){
             kid: getFirstKid(unit1),
             chore: getFirstChore(unit1),
             timeStamp: new Date().getTime(),
-            customNote: "This is a custom note"
+            customNote: "This is a custom note",
+            isTappable: false,
+            recipient: 'parent'
         });
         a2.save().then(console.log);
     }
@@ -99,7 +103,9 @@ exports.routeFactory = async function (app, User, FamilyUnit, Alert){
             kid: getFirstKid(unit1),
             chore: getFirstChore(unit1),
             timeStamp: new Date().getTime()-60*15*1000,
-            customNote: "This is a custom note"
+            customNote: "This is a custom note",
+            isTappable: false,
+            recipient: 'parent'
         });
         a3.save().then(console.log);
 
@@ -109,7 +115,9 @@ exports.routeFactory = async function (app, User, FamilyUnit, Alert){
             kid: getFirstKid(unit1),
             chore: getFirstChore(unit1),
             timeStamp: new Date().getTime(),
-            customNote: "This is a custom note"
+            customNote: "This is a custom note",
+            isTappable: false,
+            recipient: 'parent'
         });
         a4.save().then(console.log);
     }
