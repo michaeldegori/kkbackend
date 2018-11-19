@@ -12,12 +12,19 @@ const openPaths = [
     "/healthcheck",
     "/favicon.ico",
     "/",
-    "/logout"
+    "/logout",
+];
+
+const fullopenRoutes = [
+    "/pushnotification"
 ];
 
 
 module.exports = function(req, res, next) {
-    if (openPaths.includes(req.originalUrl) ){
+    if (
+        openPaths.includes(req.originalUrl) ||
+            fullopenRoutes.some(element => req.originalUrl.indexOf(element) === 0)
+    ){
         console.log("Skipping the jwt validation for " + req.originalUrl);
         return next();
     }

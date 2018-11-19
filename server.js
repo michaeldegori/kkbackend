@@ -15,6 +15,8 @@ const ChoreSuggestion = require('./src/services/DefaultChore/model').suggestionM
 const Reward = require('./src/services/DefaultReward/model').modelFactory(db);
 const Alert = require('./src/services/FamilyUnit/Alert/model').modelFactory(db);
 
+const sendPushNotification = require('./src/services/SendPushNotification.js');
+
 //middlewares and health check
 app.use(cors());
 app.use(bp.json());
@@ -34,6 +36,20 @@ app.use(require('./src/jwtMiddleware.js'));
 app.get('/logout', (req, res) => {
    res.sendFile(__dirname+ '/src/files/logout.html');
 });
+app.get('/pushnotification/:userid', async (req, res) => {
+    const targetUser = User.findOne({_id: req.params.userid});
+    if (!targetUser)
+        return res.status(404).json({err: 'User not found'});
+    if (!targetUser.pushNotificationInformation || !targetUser.pushNotificationInformation.expo || !targetUser.pushNotificationInformation.expo.map)
+        return res.status(404).json({err: 'User does not have any push token associated'});
+
+    const receipts = await sendPushNotification(
+        targetUser.pushNotificationInformation.expo.map(subscription => subscription.token),
+        "Test of the push notification system. Thug life."
+    );
+    res.json({receipts});
+});
+
 require('./src/services/User')(app, User, FamilyUnit);
 require('./src/services/FamilyUnit')(app, User, FamilyUnit, Chore, Reward);
 require('./src/services/DefaultChore').routeFactory(app, User, ChoreSuggestion);

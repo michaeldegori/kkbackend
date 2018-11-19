@@ -1,6 +1,6 @@
-import Expo from 'expo-server-sdk';
+const {Expo} = require('expo-server-sdk');
 
-module.exports = async function(pushTokens){
+module.exports = async function(pushTokens=['ExponentPushToken[hXBk4VGSK9EKwhix6i_64y]'], message="Thug life"){
     // Create a new Expo SDK client
     let expo = new Expo();
 
@@ -16,8 +16,8 @@ module.exports = async function(pushTokens){
         messages.push({
             to: pushToken,
             sound: 'default',
-            body: 'This is a test notification',
-            data: { withSome: 'data' },
+            body: message,
+            data: { testProp: 'testProp value' },
         })
     }
 
@@ -51,16 +51,19 @@ module.exports = async function(pushTokens){
     }
 
     let receiptIdChunks = expo.chunkPushNotificationReceiptIds(receiptIds);
+    let receiptsFromChunks = [];
     // Like sending notifications, there are different strategies you could use
     // to retrieve batches of receipts from the Expo service.
     for (let chunk of receiptIdChunks) {
         try {
             let receipts = await expo.getPushNotificationReceiptsAsync(chunk);
-            console.log(receipts);
+            receiptsFromChunks.push(receipts);
+            console.log('###RECEIPTS', receipts);
 
             // The receipts specify whether Apple or Google successfully received the
             // notification and information about an error, if one occurred.
-            for (let receipt of receipts) {
+            for (let receiptId in receipts) {
+                let receipt = receipts[receiptId];
                 if (receipt.status === 'ok') {
                     continue;
                 } else if (receipt.status === 'error') {
@@ -77,4 +80,5 @@ module.exports = async function(pushTokens){
             console.error(error);
         }
     }
+    return receiptsFromChunks;
 };
