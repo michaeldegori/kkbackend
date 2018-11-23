@@ -1,6 +1,7 @@
 const {isValidChore}  = require("../DefaultChore");
 const {RRule} = require('rrule');
 const {Types: {ObjectId, Mixed}} = require('mongoose');
+const {createAlertWithPush} = require('./Alert/index.js');
 
 module.exports = function(app, User, FamilyUnit, Chore, Reward){
     /**
@@ -310,16 +311,23 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward){
 
         //create alert for parent and send push notification
         //alert should have isTappable:true and recipient: parent
-        const alert = new Alert({
-            isTappable: true,
-            recipient: parent,
+        const theChore = familyUnit.existingChores.find(chore => chore._id === choreId);
+
+        const alertObj = {
             familyUnit: familyUnit._id,
-            timeStamp: new Date().getTime()
-        });
-        const saveResult2 = await alert.save();
+            kid: req.params.childId,
+            chore: choreId,
+            timeStamp: new Date().getTime(),
+            isTappable: true,
+            status: 'new',
+            notificationBody: `${familyUnit.kidsList[kidIndex].name} has requested approval for chore completion: ${theChore.name}`,
+            recipient: 'parent',
+        };
+        const alertSaveResult = await createAlertWithPush(alertObj, familyUnit, User);
+
         res.json({
             familyUnit: saveResult1,
-            alerts: saveResult2
+            alerts: alertSaveResult
         });
     });
 };

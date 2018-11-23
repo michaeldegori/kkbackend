@@ -1,6 +1,27 @@
 const mongoose = require('mongoose');
+const sendPushNotification = require('../../SendPushNotification.js');
 
-exports.routeFactory = async function (app, User, FamilyUnit, Alert){
+async function createAlertWithPush(alertObj, familyUnit, User) {
+    if (!alertObj.recipient)
+        alertObj.recipient = 'parent';
+    const alert = new Alert(alertObj);
+    const saveResult = await alert.save();
+
+    familyUnit.adminsList.forEach(async (email) => {
+        const currentUser = await User.findOne({email});
+        const userPushInfo = (currentUser.pushNotificationInformation || {});
+        const tokens = [];
+        for (let key in userPushInfo){
+            let pertinentTokens = userPushInfo[key].filter(notifInfoObj => notifInfoObj.browsingMode === alertObj.recipient);
+            tokens.push(...pertinentTokens.map(notifInfoObj => notifInfoObj.token));
+        }
+        sendPushNotification(tokens, alertObj.notificationBody);
+    });
+
+    return saveResult;
+}
+
+async function routeFactory(app, User, FamilyUnit, Alert){
     app.get('/familyunit/:unitid/alerts', async (req, res) => {
         if (!req.user || !req.user.sub) return res.status(400).json({Err: 'no token'});
         try {
@@ -26,8 +47,9 @@ exports.routeFactory = async function (app, User, FamilyUnit, Alert){
 
     app.post('/familyunit/:unitid/alerts', async (req, res) => {
 
-        const {kid, chore} = req.body;
-        if (!kid || !chore) return res.status(400).json({Err: 'missing kid or chore'});
+        const {kid, chore, isTappable, notificationBody} = req.body;
+        if (!notificationBody) return res.status(400).json({Err: 'Missing notification body'});
+        if (isTappable &&(!kid || !chore)) res.status(400).json({Err: 'Tappable Alerts need to be associated with a chore and a child'});
 
         try {
             let [currentUser, familyUnit] = await Promise.all([
@@ -39,21 +61,18 @@ exports.routeFactory = async function (app, User, FamilyUnit, Alert){
             if (!familyUnit.adminsList.includes(currentUser.email))
                 return res.status(403).json({message: "Current user token does not have access to family unit id " + req.params.id});
 
-            const alert = new Alert({
+            const saveResult = await createAlertWithPush({
                 ...req.body,
                 familyUnit: familyUnit._id,
                 timeStamp: new Date().getTime(),
                 pushNotification: true
-            });
-            const saveResult = await alert.save();
-            res.json(saveResult);
+            }, familyUnit, User);
         }
         catch(err){
             console.log(err);
             res.status(500).json({err})
         }
     });
-
 
     /**
      * default data
@@ -78,9 +97,10 @@ exports.routeFactory = async function (app, User, FamilyUnit, Alert){
             kid: getFirstKid(unit1),
             chore: getFirstChore(unit1),
             timeStamp: new Date().getTime()-60*15*1000,
-            customNote: "This is a custom note",
+            notificationBody: "This is a custom note",
             isTappable: false,
-            status: "new"
+            status: "new",
+            recipient: 'parent'
         });
         a1.save().then(console.log);
 
@@ -90,9 +110,11 @@ exports.routeFactory = async function (app, User, FamilyUnit, Alert){
             kid: getFirstKid(unit1),
             chore: getFirstChore(unit1),
             timeStamp: new Date().getTime(),
-            customNote: "This is a custom note",
+            notificationBody: "This is a custom note",
             isTappable: false,
-            status: "new"
+            status: "new",
+            recipient: 'parent',
+
         });
         a2.save().then(console.log);
     }
@@ -104,9 +126,10 @@ exports.routeFactory = async function (app, User, FamilyUnit, Alert){
             kid: getFirstKid(unit1),
             chore: getFirstChore(unit1),
             timeStamp: new Date().getTime()-60*15*1000,
-            customNote: "This is a custom note",
+            notificationBody: "This is a custom note",
             isTappable: false,
-            status: "new"
+            status: "new",
+            recipient: 'parent'
         });
         a3.save().then(console.log);
 
@@ -116,13 +139,15 @@ exports.routeFactory = async function (app, User, FamilyUnit, Alert){
             kid: getFirstKid(unit1),
             chore: getFirstChore(unit1),
             timeStamp: new Date().getTime(),
-            customNote: "This is a custom note",
+            notificationBody: "This is a custom note",
             isTappable: false,
-            status: "new"
+            status: "new",
+            recipient: 'parent'
         });
         a4.save().then(console.log);
     }
 };
+
 
 
 function getFirstKid(familyUnit){
@@ -134,4 +159,7 @@ function getFirstChore(familyUnit){
     return familyUnit.existingChores[0]._id;
 }
 
-module.exports = exports;
+module.exports = {
+    routeFactory,
+    createAlertWithPush
+};
