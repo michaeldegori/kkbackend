@@ -128,7 +128,7 @@ module.exports = function(app, User, FamilyUnit){
             expo: nextPushNotifications
         };
         const saveResult = await currentUser.save();
-        console.log(JSON.stringify(currentUser.pushNotificationInformation, null, 4));
+        console.log('#################################PUSHTOKEN', JSON.stringify(currentUser.pushNotificationInformation, null, 4));
 
         res.json({success:true});
     });

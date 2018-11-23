@@ -1,6 +1,6 @@
 const {isValidChore}  = require("../DefaultChore");
 const {RRule} = require('rrule');
-const {Types: {ObjectId}} = require('mongoose');
+const {Types: {ObjectId, Mixed}} = require('mongoose');
 
 module.exports = function(app, User, FamilyUnit, Chore, Reward){
     /**
@@ -243,7 +243,17 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward){
             doneChores: [],
             delinquentChoreInstances: [],
             allowanceAmount: Math.round((new Date().getTime() - getDOB(childData.dob))/oneYear),
-            savingsRequired: Math.round((new Date().getTime() - getDOB(childData.dob))/oneYear)
+            kreditInformation:{
+                savingsRequired: 10,
+                kiddieKashBalance: 0,
+                rewardsRedemptions: { value: 0, denominator: 30 },
+                choreHistory: { value: 0, denominator: 35 },
+                avgChoreAge: { value: 0, denominator: 15 },
+                totalChores: { value: 0, denominator: 10 },
+                rewardsRequests: { value: 0, denominator: 10 },
+                punishments: {},
+            }
+
         };
 
         if (!familyUnit.kidsList) familyUnit.kidsList = [];
@@ -293,11 +303,24 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward){
         familyUnit.kidsList[kidIndex] = Object.assign(familyUnit.kidsList[kidIndex], {
             doneChores: [
                 ...familyUnit.kidsList[kidIndex].doneChores,
-                {id: choreId, status: "unapproved"}
+                {id: choreId, status: "unapproved", timeStamp: new Date().getTime()},
             ]
         });
-        const saveResult = await familyUnit.save();
-        res.json(saveResult);
+        const saveResult1 = await familyUnit.save();
+
+        //create alert for parent and send push notification
+        //alert should have isTappable:true and recipient: parent
+        const alert = new Alert({
+            isTappable: true,
+            recipient: parent,
+            familyUnit: familyUnit._id,
+            timeStamp: new Date().getTime()
+        });
+        const saveResult2 = await alert.save();
+        res.json({
+            familyUnit: saveResult1,
+            alerts: saveResult2
+        });
     });
 };
 

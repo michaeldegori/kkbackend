@@ -42,7 +42,8 @@ exports.routeFactory = async function (app, User, FamilyUnit, Alert){
             const alert = new Alert({
                 ...req.body,
                 familyUnit: familyUnit._id,
-                timeStamp: new Date().getTime()
+                timeStamp: new Date().getTime(),
+                pushNotification: true
             });
             const saveResult = await alert.save();
             res.json(saveResult);

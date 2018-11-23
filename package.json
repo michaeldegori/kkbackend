@@ -4,7 +4,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "start": "node server.js",
     "installdeployscript": "git remote add aws ssh://kiddiekredit/home/ubuntu/kiddiekredit-api/repo",
     "deploy": "git add . && git commit && git push origin master && git push aws master",
@@ -31,6 +31,7 @@
     "rrule": "^2.5.6"
   },
   "devDependencies": {
+    "jest": "^23.6.0",
     "nodemon": "^1.18.4"
   }
 }

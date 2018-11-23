@@ -12,11 +12,33 @@ const KidInfoSchema = new Schema({
     kiddieKash: {type: Number},
     assignedChores: [{type: Schema.Types.ObjectId}],
     eligibleRewards: [{type: Schema.Types.ObjectId}],
-    rewardsRedemptions: [Schema.Types.Mixed],
-    doneChores: [Schema.Types.Mixed],
-    delinquentChoreInstances: [Schema.Types.Mixed],
+    rewardsRedemptions: [{
+        timeStamp: Number,
+        id: Schema.Types.ObjectId
+    }],
+    doneChores: [{
+        timeStamp: Number,
+        id: Schema.Types.ObjectId,
+        status: String
+    }],
+    delinquentChoreInstances: [
+        {
+            timeStamp: Number,
+            id: Schema.Types.ObjectId
+        }
+    ],
     allowanceAmount: {type: Number},
-    savingsRequired: {type: Number},
+    kreditInformation: {
+        savingsRequired: {type: Number},
+        kiddieKashBalance: {type: Number},
+        rewardsRedemptions: { value: Number, denominator: Number },
+        choreHistory: { value: Number, denominator: Number },
+        avgChoreAge: { value: Number, denominator: Number },
+        totalChores: { value: Number, denominator: Number },
+        rewardsRequests: { value: Number, denominator: Number },
+        punishments: { type: Schema.Types.Mixed },
+    }
+
 });
 
 const FamilyUnitSchema = new Schema({
