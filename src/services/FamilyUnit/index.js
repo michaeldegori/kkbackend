@@ -295,8 +295,12 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward){
         if (typeof choreId === 'undefined')
             return res.status(400).json({message: "Invalid chore data"});
 
+
         const familyUnit = await FamilyUnit.findOne({_id: req.params.unitid});
         if (!familyUnit) return res.status(404).json({message: "familyUnit not found"});
+
+        const theChore = familyUnit.existingChores.find(chore => chore._id.toString() === choreId);
+        if (!theChore) return res.status(400).json({message: "incorrect chore id"});
 
         let kidIndex = familyUnit.kidsList.findIndex(kid => kid._id.toString() === req.params.childid);
         if (kidIndex === -1) return res.status(404).json({message: "kid not found in family unit"});
@@ -311,7 +315,7 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward){
 
         //create alert for parent and send push notification
         //alert should have isTappable:true and recipient: parent
-        const theChore = familyUnit.existingChores.find(chore => chore._id === choreId);
+
 
         const alertObj = {
             familyUnit: familyUnit._id,
