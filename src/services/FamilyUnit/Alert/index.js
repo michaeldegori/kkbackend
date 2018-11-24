@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const sendPushNotification = require('../../SendPushNotification.js');
 
-async function createAlertWithPush(alertObj, familyUnit, User) {
+async function createAlertWithPush(alertObj, familyUnit, User, Alert) {
     if (!alertObj.recipient)
         alertObj.recipient = 'parent';
     const alert = new Alert(alertObj);
@@ -66,7 +66,7 @@ async function routeFactory(app, User, FamilyUnit, Alert){
                 familyUnit: familyUnit._id,
                 timeStamp: new Date().getTime(),
                 pushNotification: true
-            }, familyUnit, User);
+            }, familyUnit, User, Alert);
         }
         catch(err){
             console.log(err);

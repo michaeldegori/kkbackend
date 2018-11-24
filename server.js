@@ -51,7 +51,7 @@ app.get('/pushnotification/:userid', async (req, res) => {
 });
 
 require('./src/services/User')(app, User, FamilyUnit);
-require('./src/services/FamilyUnit')(app, User, FamilyUnit, Chore, Reward);
+require('./src/services/FamilyUnit')(app, User, FamilyUnit, Chore, Reward, Alert);
 require('./src/services/DefaultChore').routeFactory(app, User, ChoreSuggestion);
 require('./src/services/DefaultReward').routeFactory(app, User, Reward);
 require('./src/services/FamilyUnit/Alert').routeFactory(app, User, FamilyUnit, Alert);

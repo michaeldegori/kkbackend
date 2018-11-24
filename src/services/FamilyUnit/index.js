@@ -3,7 +3,7 @@ const {RRule} = require('rrule');
 const {Types: {ObjectId, Mixed}} = require('mongoose');
 const {createAlertWithPush} = require('./Alert/index.js');
 
-module.exports = function(app, User, FamilyUnit, Chore, Reward){
+module.exports = function(app, User, FamilyUnit, Chore, Reward, Alert){
     /**
      * Get family unit pertaining to user id of main logged in user,
      * including chores and rewards available
@@ -327,7 +327,7 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward){
             notificationBody: `${familyUnit.kidsList[kidIndex].name} has requested approval for chore completion: ${theChore.name}`,
             recipient: 'parent',
         };
-        const alertSaveResult = await createAlertWithPush(alertObj, familyUnit, User);
+        const alertSaveResult = await createAlertWithPush(alertObj, familyUnit, User, Alert);
 
         res.json({
             familyUnit: saveResult1,
