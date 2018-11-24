@@ -327,12 +327,9 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward, Alert){
             notificationBody: `${familyUnit.kidsList[kidIndex].name} has requested approval for chore completion: ${theChore.name}`,
             recipient: 'parent',
         };
-        const alertSaveResult = await createAlertWithPush(alertObj, familyUnit, User, Alert);
+        createAlertWithPush(alertObj, familyUnit, User, Alert);
 
-        res.json({
-            familyUnit: saveResult1,
-            alerts: alertSaveResult
-        });
+        res.json(saveResult1);
     });
 };
 
