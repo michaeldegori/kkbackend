@@ -305,15 +305,16 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward, Alert){
         let kidIndex = familyUnit.kidsList.findIndex(kid => kid._id.toString() === req.params.childid);
         if (kidIndex === -1) return res.status(404).json({message: "kid not found in family unit"});
 
+        const doneChoreId = new mongoose.Types.ObjectId();
         familyUnit.kidsList[kidIndex] = Object.assign(familyUnit.kidsList[kidIndex], {
             doneChores: [
                 ...(familyUnit.kidsList[kidIndex].doneChores || []),
-                {chore: choreId, status: "unapproved", timeStamp: new Date().getTime()},
+                {_id: doneChoreId, chore: choreId, status: "unapproved", timeStamp: new Date().getTime()},
             ]
         });
-        const doneChoreIndex = familyUnit.kidsList[kidIndex].doneChores.length - 1;
+
         const saveResult1 = await familyUnit.save();
-        const doneChoreId = saveResult1.kidsList[kidIndex].doneChores[doneChoreIndex]._id;
+
 
         //create alert for parent and send push notification
         //alert should have isTappable:true and recipient: parent
@@ -351,35 +352,39 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward, Alert){
 
         let kidIndex = familyUnit.kidsList.findIndex(kid => kid._id.toString() === req.params.childid);
         if (kidIndex === -1) return res.status(404).json({message: "kid not found in family unit"});
+        const theKid = familyUnit.kidsList[kidIndex];
 
-        const doneChoreEntry = familyUnit.kidsList[kidIndex].doneChores[doneChoreId];
+        const doneChoreEntry = theKid.doneChores.find(c => c._id.toString() === doneChoreId);
         if (!doneChoreEntry) return res.status(404).json({message: "doneChoreId illegal"});
 
         const theChore = familyUnit.existingChores.find(chore => chore._id.toString() === doneChoreEntry);
         if (!theChore) return res.status(400).json({message: "incorrect chore id"});
 
         let kidUpdate = {
-            doneChores: [
-                ...familyUnit.kidsList[kidIndex].doneChores.slice(0, doneChoreIndex),
-                {...doneChoreEntry, status: status},
-                ...familyUnit.kidsList[kidIndex].doneChores.slice(doneChoreIndex+1),
-            ]
+            doneChores: familyUnit.kidsList[kidIndex].doneChores.map(dc => {
+                if (dc._id.toString() !== doneChoreId) return dc;
+                return Object.assign({}, dc, {status});
+            })
         };
+        let notificationBody = `Congratulations! Your submission for '${theChore.name}' has been approved!`
+        if (status !== "approved"){
+            notificationBody = `Your submission for '${theChore.name}' has been denied. Check with your parent to find why.`;
+        }
 
 
-        familyUnit.kidsList[kidIndex] = Object.assign(familyUnit.kidsList[kidIndex], kidUpdate);
+        familyUnit.kidsList[kidIndex] = Object.assign(theKid, kidUpdate);
         const saveResult1 = await familyUnit.save();
 
 
         const alertObj = {
             familyUnit: familyUnit._id,
-            kid: req.params.childid,
-            chore: choreId,
+            kid: theKid._id,
+            chore: theChore._id,
             timeStamp: new Date().getTime(),
-            isTappable: true,
+            isTappable: false,
             status: 'new',
-            notificationBody: `${familyUnit.kidsList[kidIndex].name} has requested approval for chore completion: ${theChore.name}`,
-            recipient: 'parent',
+            notificationBody,
+            recipient: 'child-'+theKid._id.toString(),
         };
         createAlertWithPush(alertObj, familyUnit, User, Alert);
 

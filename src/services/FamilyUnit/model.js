@@ -13,18 +13,21 @@ const KidInfoSchema = new Schema({
     assignedChores: [{type: Schema.Types.ObjectId}],
     eligibleRewards: [{type: Schema.Types.ObjectId}],
     rewardsRedemptions: [{
+        id: Schema.Types.ObjectId,
         timeStamp: Number,
-        id: Schema.Types.ObjectId
+        reward: Schema.Types.ObjectId
     }],
     doneChores: [{
-        timeStamp: Number,
         id: Schema.Types.ObjectId,
+        timeStamp: Number,
+        chore: Schema.Types.ObjectId,
         status: String
     }],
     delinquentChoreInstances: [
         {
+            id: Schema.Types.ObjectId,
             timeStamp: Number,
-            id: Schema.Types.ObjectId
+            chore: Schema.Types.ObjectId
         }
     ],
     allowanceAmount: {type: Number},
