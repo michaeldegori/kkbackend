@@ -364,9 +364,10 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward, Alert){
         let kidUpdate = {
             doneChores: familyUnit.kidsList[kidIndex].doneChores.map(dc => {
                 if (dc._id.toString() !== doneChoreId) return dc;
-                return Object.assign({}, dc, {status});
+                return {...dc, status: status};
             })
         };
+        console.log(kidUpdate);
         let notificationBody = `Congratulations! Your submission for '${theChore.name}' has been approved!`
         if (status !== "approved"){
             notificationBody = `Your submission for '${theChore.name}' has been denied. Check with your parent to find why.`;
