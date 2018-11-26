@@ -2,6 +2,7 @@ const {isValidChore}  = require("../DefaultChore");
 const {RRule} = require('rrule');
 const {Types: {ObjectId, Mixed}} = require('mongoose');
 const {createAlertWithPush} = require('./Alert/index.js');
+const mongoose = require('mongoose');
 
 module.exports = function(app, User, FamilyUnit, Chore, Reward, Alert){
     /**
