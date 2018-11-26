@@ -319,7 +319,7 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward, Alert){
 
         const alertObj = {
             familyUnit: familyUnit._id,
-            kid: req.params.childId,
+            kid: req.params.childid,
             chore: choreId,
             timeStamp: new Date().getTime(),
             isTappable: true,
