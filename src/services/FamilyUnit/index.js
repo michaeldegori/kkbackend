@@ -358,7 +358,7 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward, Alert){
         const doneChoreEntry = theKid.doneChores.find(c => c._id.toString() === doneChoreId);
         if (!doneChoreEntry) return res.status(404).json({message: "doneChoreId illegal"});
 
-        const theChore = familyUnit.existingChores.find(chore => chore._id.toString() === doneChoreEntry);
+        const theChore = familyUnit.existingChores.find(chore => chore._id.toString() === doneChoreEntry.chore);
         if (!theChore) return res.status(400).json({message: "incorrect chore id"});
 
         let kidUpdate = {
