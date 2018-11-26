@@ -307,11 +307,11 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward, Alert){
         if (kidIndex === -1) return res.status(404).json({message: "kid not found in family unit"});
 
         const doneChoreId = new mongoose.Types.ObjectId();
-        familyUnit.kidsList[kidIndex] = Object.assign(familyUnit.kidsList[kidIndex], {
-            doneChores: [
-                ...(familyUnit.kidsList[kidIndex].doneChores || []),
-                {_id: doneChoreId, chore: choreId, status: "unapproved", timeStamp: new Date().getTime()},
-            ]
+        familyUnit.kidsList[kidIndex].doneChores.push( {
+            _id: doneChoreId,
+            chore: choreId,
+            status: "unapproved",
+            timeStamp: new Date().getTime()
         });
 
         const saveResult1 = await familyUnit.save();
@@ -356,27 +356,28 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward, Alert){
         const theKid = familyUnit.kidsList[kidIndex];
 
         const doneChoreEntry = theKid.doneChores.find(c => c._id.toString() === doneChoreId);
+        const doneChoreIndex = theKid.doneChores.findIndex(c => c._id.toString() === doneChoreId);
         if (!doneChoreEntry) return res.status(404).json({message: "doneChoreId illegal"});
 
         const theChore = familyUnit.existingChores.find(chore => chore._id.toString() === doneChoreEntry.chore.toString());
         if (!theChore) return res.status(400).json({message: "incorrect chore id"});
 
-        let kidUpdate = {
-            doneChores: familyUnit.kidsList[kidIndex].doneChores.map(dc => {
-                if (dc._id.toString() !== doneChoreId) return dc;
-                return {...dc, status: status};
-            })
-        };
-        console.log(kidUpdate);
+        // let kidUpdate = {
+        //     doneChores: familyUnit.kidsList[kidIndex].doneChores.toJSON().map(dc => {
+        //         if (dc._id.toString() !== doneChoreId) return dc;
+        //         return {...dc, status: status};
+        //     })
+        // };
+        doneChoreEntry.status = status;
+
+        // familyUnit.kidsList[kidIndex] = Object.assign(theKid, kidUpdate);
+        const saveResult1 = await familyUnit.save();
+
+
         let notificationBody = `Congratulations! Your submission for '${theChore.name}' has been approved!`
         if (status !== "approved"){
             notificationBody = `Your submission for '${theChore.name}' has been denied. Check with your parent to find why.`;
         }
-
-
-        familyUnit.kidsList[kidIndex] = Object.assign(theKid, kidUpdate);
-        const saveResult1 = await familyUnit.save();
-
 
         const alertObj = {
             familyUnit: familyUnit._id,
