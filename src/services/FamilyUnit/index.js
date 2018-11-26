@@ -307,14 +307,68 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward, Alert){
 
         familyUnit.kidsList[kidIndex] = Object.assign(familyUnit.kidsList[kidIndex], {
             doneChores: [
-                ...familyUnit.kidsList[kidIndex].doneChores,
-                {id: choreId, status: "unapproved", timeStamp: new Date().getTime()},
+                ...(familyUnit.kidsList[kidIndex].doneChores || []),
+                {chore: choreId, status: "unapproved", timeStamp: new Date().getTime()},
             ]
         });
+        const doneChoreIndex = familyUnit.kidsList[kidIndex].doneChores.length - 1;
         const saveResult1 = await familyUnit.save();
+        const doneChoreId = saveResult1.kidsList[kidIndex].doneChores[doneChoreIndex]._id;
 
         //create alert for parent and send push notification
         //alert should have isTappable:true and recipient: parent
+
+
+        const alertObj = {
+            familyUnit: familyUnit._id,
+            kid: req.params.childid,
+            chore: choreId,
+            timeStamp: new Date().getTime(),
+            isTappable: true,
+            status: 'new',
+            notificationBody: `${familyUnit.kidsList[kidIndex].name} has requested approval for chore completion: ${theChore.name}`,
+            recipient: 'parent',
+            doneChoreId
+        };
+        createAlertWithPush(alertObj, familyUnit, User, Alert);
+
+        res.json(saveResult1);
+    });
+
+    /**
+     * Process chore approval request
+     */
+    app.patch('/familyunit/:unitid/child/:childid/processapprovalrequest', async (req, res) => {
+        const {doneChoreId, status} = req.body;
+        if (typeof doneChoreId === 'undefined' || typeof status !== 'string')
+            return res.status(400).json({message: "Invalid chore or status data"});
+
+        if (status !== "approved" && status !== "denied")
+            return res.status(400).json({message: `Invalid chore status specified: ${status}`});
+
+        const familyUnit = await FamilyUnit.findOne({_id: req.params.unitid});
+        if (!familyUnit) return res.status(404).json({message: "familyUnit not found"});
+
+        let kidIndex = familyUnit.kidsList.findIndex(kid => kid._id.toString() === req.params.childid);
+        if (kidIndex === -1) return res.status(404).json({message: "kid not found in family unit"});
+
+        const doneChoreEntry = familyUnit.kidsList[kidIndex].doneChores[doneChoreId];
+        if (!doneChoreEntry) return res.status(404).json({message: "doneChoreId illegal"});
+
+        const theChore = familyUnit.existingChores.find(chore => chore._id.toString() === doneChoreEntry);
+        if (!theChore) return res.status(400).json({message: "incorrect chore id"});
+
+        let kidUpdate = {
+            doneChores: [
+                ...familyUnit.kidsList[kidIndex].doneChores.slice(0, doneChoreIndex),
+                {...doneChoreEntry, status: status},
+                ...familyUnit.kidsList[kidIndex].doneChores.slice(doneChoreIndex+1),
+            ]
+        };
+
+
+        familyUnit.kidsList[kidIndex] = Object.assign(familyUnit.kidsList[kidIndex], kidUpdate);
+        const saveResult1 = await familyUnit.save();
 
 
         const alertObj = {

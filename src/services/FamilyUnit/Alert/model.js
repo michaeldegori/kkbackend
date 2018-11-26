@@ -11,6 +11,7 @@ const AlertSchema = new Schema({
     status: {type: String, enum:["new", "processed"]},
     notificationBody: String,
     recipient: String, //matches up to browsing_mode
+    doneChoreId: Schema.Types.ObjectId,
 });
 
 
