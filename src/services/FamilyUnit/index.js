@@ -341,7 +341,7 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward, Alert){
      * Process chore approval request
      */
     app.patch('/familyunit/:unitid/child/:childid/processapprovalrequest', async (req, res) => {
-        const {doneChoreId, status} = req.body;
+        const {doneChoreId, status, alertId} = req.body;
         if (typeof doneChoreId === 'undefined' || typeof status !== 'string')
             return res.status(400).json({message: "Invalid chore or status data"});
 
@@ -362,12 +362,7 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward, Alert){
         const theChore = familyUnit.existingChores.find(chore => chore._id.toString() === doneChoreEntry.chore.toString());
         if (!theChore) return res.status(400).json({message: "incorrect chore id"});
 
-        // let kidUpdate = {
-        //     doneChores: familyUnit.kidsList[kidIndex].doneChores.toJSON().map(dc => {
-        //         if (dc._id.toString() !== doneChoreId) return dc;
-        //         return {...dc, status: status};
-        //     })
-        // };
+
         doneChoreEntry.status = status;
 
         // familyUnit.kidsList[kidIndex] = Object.assign(theKid, kidUpdate);
@@ -391,7 +386,15 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward, Alert){
         };
         createAlertWithPush(alertObj, familyUnit, User, Alert);
 
-        res.json(saveResult1);
+        const theAlert = await Alert.findOne({_id: alertId});
+        theAlert.status = "processed";
+        theAlert.isTappable = 'false';
+        const savedAlert = await theAlert.save();
+
+        res.json({
+            familyUnit: saveResult1,
+            alert: savedAlert
+        });
     });
 };
 
