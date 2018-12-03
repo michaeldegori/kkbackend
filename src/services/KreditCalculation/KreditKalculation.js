@@ -3,11 +3,11 @@
  * @param familyUnit a family unit according to mongoose schema
  * @returns {
  *     [kidId1]: {
- *         rewardsRedemptions
+ *         rewardsRedemptions -> utilization
  *         choreHistory
  *         avgChoreAge,
  *         totalChores,
- *         rewardsRequests,
+ *         rewardsRequests, -> inquiries
  *         punishments?
  *     },
  *     [kidId2]: ...
@@ -17,11 +17,11 @@ function getKreditInformationForFamilyUnit(familyUnit){
     const allCreditReports = {};
     familyUnit.kidsList.forEach(kid => {
         allCreditReports[kid._id.toString()] = {
-            rewardsRedemptions: computeRewardsRedemptions(familyUnit, kid),
+            utilization: computeUtilization(familyUnit, kid),
             choreHistory: computeChoreHistory(familyUnit, kid),
             avgChoreAge: computeAvgChoreAge(familyUnit, kid),
             totalChores: computeTotalChores(familyUnit, kid),
-            rewardsRequests: computeRewardsRequests(familyUnit, kid),
+            inquiries: computeInquiries(familyUnit, kid),
             punishments: computePunishments(familyUnit, kid)
 
         };
@@ -29,19 +29,29 @@ function getKreditInformationForFamilyUnit(familyUnit){
 
     return allCreditReports;
 }
+function getKreditInformationForKid(familyUnit, kid){
+    return {
+        utilization: computeUtilization(familyUnit, kid),
+        choreHistory: computeChoreHistory(familyUnit, kid),
+        avgChoreAge: computeAvgChoreAge(familyUnit, kid),
+        totalChores: computeTotalChores(familyUnit, kid),
+        inquiries: computeInquiries(familyUnit, kid),
+        punishments: computePunishments(familyUnit, kid)
+
+    };
+}
 
 
 
-function computeRewardsRedemptions(familyUnit, kid){
+function computeUtilization(familyUnit, kid){
     const redeemedRewards = kid.rewardsRedemptions.map(rewardLink => ({
         ...rewardLink,
-        reward: familyUnit.existingRewards.find(fReward => fReward._id.toString() === rewardLink.id.toString())
+        reward: familyUnit.existingRewards.find(fReward => fReward._id.toString() === rewardLink.reward.toString())
     }));
     const redeemedRewardsValue = redeemedRewards.reduce((p,c) => p + Number(c.reward.kkCost), 0);
     const kkBalance = (kid.kreditInformation && kid.kreditInformation.kiddieKashBalance) || 0;
 
-    if (kkBalance === 0 && redeemedRewardsValue === 0) return 20;
-    if (kkBalance === 0) return 20;
+    if (redeemedRewardsValue === 0) return 30;
 
     const utilizationThreshold = (kid.kreditInformation && kid.kreditInformation.savingsRequired) || 10;
     const utilizationRatio = Math.round(redeemedRewardsValue*100/kkBalance);
@@ -55,7 +65,7 @@ function computeChoreHistory(familyUnit, kid) {
     if (!kid.delinquentChoreInstances || kid.delinquentChoreInstances.length === 0) return 35;
     const delinquentChores = kid.delinquentChoreInstances.map(delinquentRecord => ({
         ...delinquentRecord,
-        chore: familyUnit.existingChores.find(chore=> chore._id.toString() === delinquentRecord.id.toString())
+        chore: familyUnit.existingChores.find(chore=> chore._id.toString() === delinquentRecord.chore.toString())
     }));
     const pointsDeduction = delinquentChores.map(delinquentRecord => Number(delinquentRecord.chore.priority || 1) )
         .reduce((p,c) => p+c, 0);
@@ -68,7 +78,7 @@ function computeAvgChoreAge(familyUnit, kid) {
     const kidsChores = kid.assignedChores.map(choreId => familyUnit.existingChores.find(chore => chore._id.toString() === choreId.toString()));
     const oneDay = 1000 * 60 * 60 * 24;
     const now = new Date().getTime();
-    const kidsChoresAgesInDays = kidsChores.map(chore => Math.ceil((now - chore.startDate)/oneDay) );
+    const kidsChoresAgesInDays = kidsChores.map(chore => (now - chore.startDate)/oneDay);
     const avgAge = kidsChoresAgesInDays.reduce((p,c) => p+c, 0)/kidsChores.length;
     if (avgAge >= 42) return 15;
 
@@ -82,7 +92,7 @@ function computeTotalChores(familyUnit, kid) {
     return 10 - 2*(5-numChores);
 }
 
-function computeRewardsRequests(familyUnit, kid) {
+function computeInquiries(familyUnit, kid) {
     const sevenDaysAgo = new Date().getTime() - 7 * 1000 * 60 * 60 * 24;
     const rewardsThisWeek = (kid.rewardsRedemptions || []).filter(rewardRedemption => rewardRedemption.timeStamp && rewardRedemption.timeStamp >= sevenDaysAgo);
     const numRewardsThisWeek = rewardsThisWeek.length;
@@ -97,10 +107,11 @@ function computePunishments(familyUnit, kid) {
 
 module.exports = {
     getKreditInformationForFamilyUnit,
-    computeRewardsRedemptions,
+    getKreditInformationForKid,
+    computeUtilization: computeUtilization,
     computeChoreHistory,
     computeAvgChoreAge,
     computeTotalChores,
-    computeRewardsRequests,
+    computeInquiries,
     computePunishments,
 };

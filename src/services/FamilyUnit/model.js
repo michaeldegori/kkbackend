@@ -21,7 +21,7 @@ const KidInfoSchema = new Schema({
         id: Schema.Types.ObjectId,
         timeStamp: Number,
         chore: Schema.Types.ObjectId,
-        status: String
+        status: {type: String, enum: ['approved', 'unapproved', 'denied']}
     }],
     delinquentChoreInstances: [
         {
@@ -49,7 +49,8 @@ const FamilyUnitSchema = new Schema({
     kidsList: [KidInfoSchema],
     existingChores: [ChoreSchema],
     choreExceptions: [Schema.Types.Mixed],
-    existingRewards: [RewardSchema]
+    existingRewards: [RewardSchema],
+    lastProcessedTime: Number
 });
 
 module.exports = function(db){

@@ -8,7 +8,8 @@
     "start": "node server.js",
     "installdeployscript": "git remote add aws ssh://kiddiekredit/home/ubuntu/kiddiekredit-api/repo",
     "deploy": "git add . && git commit && git push origin master && git push aws master",
-    "startprod": "pm2 start ecosystem.config.js --env production"
+    "startprod": "pm2 start ecosystem.config.js --env production",
+    "startbatchprocess": "node src/services/PerformDBBatchProcess.js"
   },
   "repository": {
     "type": "git",
@@ -27,6 +28,7 @@
     "express": "^4.16.3",
     "express-jwt": "^5.3.1",
     "jwks-rsa": "^1.3.0",
+    "mongodb": "^3.1.10",
     "mongoose": "^5.2.17",
     "rrule": "^2.5.6"
   },

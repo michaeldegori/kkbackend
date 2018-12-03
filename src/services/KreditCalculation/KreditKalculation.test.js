@@ -1,10 +1,10 @@
 const {
     getKreditInformationForFamilyUnit,
-    computeRewardsRedemptions,
+    computeUtilization,
     computeChoreHistory,
     computeAvgChoreAge,
     computeTotalChores,
-    computeRewardsRequests,
+    computeInquiries,
     computePunishments,
 } = require('./KreditKalculation');
 
@@ -156,30 +156,30 @@ const mockMax = {
     "assignedChores": ["5bd3b8bf348176460b2c7fb9", "5bdcd459f3b62e14cc61f00b"], //0 and 1
     "eligibleRewards": ["5bd36bf9348176460b2c7fb6"],
     "rewardsRedemptions": [
-        { id: '5bd36bf9348176460b2c7fb6', timeStamp: new Date().getTime() - oneDay*5 }, //kkcost 1
-        { id: '5bd36bf9348176460b2c7fb6', timeStamp: new Date().getTime() - oneDay*4 },
-        { id: '5bd36bf9348176460b2c7fb6', timeStamp: new Date().getTime() - oneDay*3 },
-        { id: '5bd36bf9348176460b2c7fb6', timeStamp: new Date().getTime() - oneDay*2 },
-        { id: '5bd36bf9348176460b2c7fb6', timeStamp: new Date().getTime() - oneDay*2 },
-        { id: '5bd36bf9348176460b2c7fb6', timeStamp: new Date().getTime() - oneDay*2 },
-        { id: '5bd36bf9348176460b2c7fb6', timeStamp: new Date().getTime() - oneDay*3 },
-        { id: '5bd36bf9348176460b2c7fb6', timeStamp: new Date().getTime() - oneDay*1 }, //total 8
+        { id: 'bbd36bf9348176460b2c7fb6', reward: '5bd36bf9348176460b2c7fb6', timeStamp: new Date().getTime() - oneDay*5 }, //kkcost 1
+        { id: 'bbd36bf9348176460b2c7fb6', reward: '5bd36bf9348176460b2c7fb6', timeStamp: new Date().getTime() - oneDay*4 },
+        { id: 'bbd36bf9348176460b2c7fb6', reward: '5bd36bf9348176460b2c7fb6', timeStamp: new Date().getTime() - oneDay*3 },
+        { id: 'bbd36bf9348176460b2c7fb6', reward: '5bd36bf9348176460b2c7fb6', timeStamp: new Date().getTime() - oneDay*2 },
+        { id: 'bbd36bf9348176460b2c7fb6', reward: '5bd36bf9348176460b2c7fb6', timeStamp: new Date().getTime() - oneDay*2 },
+        { id: 'bbd36bf9348176460b2c7fb6', reward: '5bd36bf9348176460b2c7fb6', timeStamp: new Date().getTime() - oneDay*2 },
+        { id: 'bbd36bf9348176460b2c7fb6', reward: '5bd36bf9348176460b2c7fb6', timeStamp: new Date().getTime() - oneDay*3 },
+        { id: 'bbd36bf9348176460b2c7fb6', reward: '5bd36bf9348176460b2c7fb6', timeStamp: new Date().getTime() - oneDay*1 }, //total 8
     ],
     "doneChores": [
-        {"id": "5bdcd459f3b62e14cc61f00b", "status": 'approved', timeStamp: new Date().getTime() - oneDay * 14}, //reward 2
-        {"id": "5bdcd459f3b62e14cc61f00b", "status": 'approved', timeStamp: new Date().getTime() - oneDay * 5},
-        {"id": "5bdcd459f3b62e14cc61f00b", "status": 'approved', timeStamp: new Date().getTime() - oneDay * 4},
-        {"id": "5bdcd459f3b62e14cc61f00b", "status": 'approved', timeStamp: new Date().getTime() - oneDay * 3},
-        {"id": "5bd3b8bf348176460b2c7fb9", "status": 'unapproved', timeStamp: new Date().getTime() - oneDay * 1}, //reward 1  total = 21
+        {"id": "abdcd459f3b62e14cc61f00b", "chore": "5bdcd459f3b62e14cc61f00b", "status": 'approved', timeStamp: new Date().getTime() - oneDay * 14}, //reward 2
+        {"id": "abdcd459f3b62e14cc61f00b", "chore": "5bdcd459f3b62e14cc61f00b", "status": 'approved', timeStamp: new Date().getTime() - oneDay * 5},
+        {"id": "abdcd459f3b62e14cc61f00b", "chore": "5bdcd459f3b62e14cc61f00b", "status": 'approved', timeStamp: new Date().getTime() - oneDay * 4},
+        {"id": "abdcd459f3b62e14cc61f00b", "chore": "5bdcd459f3b62e14cc61f00b", "status": 'approved', timeStamp: new Date().getTime() - oneDay * 3},
+        {"id": "abd3b8bf348176460b2c7fb9", "chore": "5bd3b8bf348176460b2c7fb9", "status": 'unapproved', timeStamp: new Date().getTime() - oneDay * 1}, //reward 1  total = 21
     ],
     "delinquentChoreInstances": [
-        {timeStamp: new Date().getTime()-oneDay*10, id: '5bd3b8bf348176460b2c7fb9'}, //3 priority
-        {timeStamp: new Date().getTime()-oneDay*8, id: '5bd3b8bf348176460b2c7fb9'},
-        {timeStamp: new Date().getTime()-oneDay*7, id: '5bdcd459f3b62e14cc61f00b'}, //2
-        {timeStamp: new Date().getTime()-oneDay*6, id: '5bd3b8bf348176460b2c7fb9'},
-        {timeStamp: new Date().getTime()-oneDay*5, id: '5bdcd459f3b62e14cc61f00b'},
-        {timeStamp: new Date().getTime()-oneDay*2, id: '5bd3b8bf348176460b2c7fb9'},
-        {timeStamp: new Date().getTime()-oneDay*1, id: '5bdcd459f3b62e14cc61f00b'}, //total missed points 18
+        {id: 'dbd3b8bf348176460b2c7fb9', timeStamp: new Date().getTime()-oneDay*10, chore: '5bd3b8bf348176460b2c7fb9'}, //3 priority
+        {id: 'dbd3b8bf348176460b2c7fb9', timeStamp: new Date().getTime()-oneDay*8, chore: '5bd3b8bf348176460b2c7fb9'},
+        {id: 'dbdcd459f3b62e14cc61f00b', timeStamp: new Date().getTime()-oneDay*7, chore: '5bdcd459f3b62e14cc61f00b'}, //2
+        {id: 'dbd3b8bf348176460b2c7fb9', timeStamp: new Date().getTime()-oneDay*6, chore: '5bd3b8bf348176460b2c7fb9'},
+        {id: 'dbdcd459f3b62e14cc61f00b', timeStamp: new Date().getTime()-oneDay*5, chore: '5bdcd459f3b62e14cc61f00b'},
+        {id: 'dbd3b8bf348176460b2c7fb9', timeStamp: new Date().getTime()-oneDay*2, chore: '5bd3b8bf348176460b2c7fb9'},
+        {id: 'dbdcd459f3b62e14cc61f00b', timeStamp: new Date().getTime()-oneDay*1, chore: '5bdcd459f3b62e14cc61f00b'}, //total missed points 18
     ],
     "_id": "5bd36ba3348176460b2c7fb4",
     "name": "Max",
@@ -203,7 +203,7 @@ const mockEmma = {
     "eligibleRewards": ["5bd36bf9348176460b2c7fb6"],
     "rewardsRedemptions": [],
     "doneChores": [
-        {"id": "5bdcd477f3b62e14cc61f00e", "approved": false}
+        {"id": "abdcd477f3b62e14cc61f00e", "chore": "5bdcd477f3b62e14cc61f00e", "status": "unapproved"}
     ],
     "delinquentChoreInstances": [],
     "_id": "5bd36bca348176460b2c7fb5",
@@ -215,10 +215,10 @@ const mockEmma = {
     "savingsRequired": 5
 };
 
-test('ComputeRewardsRedemptions - Computes score based on not exceeding 90% of reward utilization',
+test('ComputeUtilization - Computes score based on not exceeding 90% of reward utilization',
     () => {
-        const maxUtiliationRatio = computeRewardsRedemptions(mockFamilyUnit, mockMax);
-        const emmaUtilizationRatio = computeRewardsRedemptions(mockFamilyUnit, mockEmma);
+        const maxUtiliationRatio = computeUtilization(mockFamilyUnit, mockMax);
+        const emmaUtilizationRatio = computeUtilization(mockFamilyUnit, mockEmma);
         expect(maxUtiliationRatio).toBe(30);
         expect(emmaUtilizationRatio).toBe(20);
     });
@@ -236,16 +236,16 @@ test('ComputeAvgChoreAge - Computes average chore age correctly for max and emma
     () => {
         const maxChoresScore = computeAvgChoreAge(mockFamilyUnit, mockMax);
         const emmaChoresScore = computeAvgChoreAge(mockFamilyUnit, mockEmma);
-        const maxChoreAgeMillis = (
+        const maxChoreAgeDays = (
             (new Date() - new Date(mockFamilyUnit.existingChores[0].startDate)) +
             (new Date() - new Date(mockFamilyUnit.existingChores[1].startDate))
-        )/2;
-        const emmaChoreAgeMillis = (
+        )/oneDay;
+        const emmaChoreAgeDays = (
             (new Date() - new Date(mockFamilyUnit.existingChores[0].startDate)) +
             (new Date() - new Date(mockFamilyUnit.existingChores[2].startDate))
-        )/2;
-        const maxChoreAge = Math.ceil(maxChoreAgeMillis/(1000*60*60*24));
-        const emmaChoreAge = Math.ceil(emmaChoreAgeMillis/(1000*60*60*24));
+        )/oneDay;
+        const maxChoreAge = Math.ceil(maxChoreAgeDays/2);
+        const emmaChoreAge = Math.ceil(emmaChoreAgeDays/2);
         expect(maxChoresScore).toBe(15 - (42 - maxChoreAge)*0.5);
         expect(emmaChoresScore).toBe(15 - (42 - emmaChoreAge)*0.5);
     });
@@ -258,10 +258,10 @@ test('ComputeTotalChores - correctly computes number of chores for Max and Emma'
         expect(emmaChoresScore).toBe(4);
     });
 
-test('ComputeRewardsRequests - correctly computes point deduction for rewards requested over the past 7 days',
+test('computeInquiries - correctly computes point deduction for rewards requested over the past 7 days',
     () => {
-        const maxRewardsRequestsScore = computeRewardsRequests(mockFamilyUnit, mockMax);
-        const emmaRewardssRequestsScore = computeRewardsRequests(mockFamilyUnit, mockEmma);
+        const maxRewardsRequestsScore = computeInquiries(mockFamilyUnit, mockMax);
+        const emmaRewardssRequestsScore = computeInquiries(mockFamilyUnit, mockEmma);
         expect(maxRewardsRequestsScore).toBe(7);
         expect(emmaRewardssRequestsScore).toBe(10);
     });
