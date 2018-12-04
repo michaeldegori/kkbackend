@@ -17,11 +17,11 @@ function getKreditInformationForFamilyUnit(familyUnit){
     const allCreditReports = {};
     familyUnit.kidsList.forEach(kid => {
         allCreditReports[kid._id.toString()] = {
-            utilization: computeUtilization(familyUnit, kid),
-            choreHistory: computeChoreHistory(familyUnit, kid),
-            avgChoreAge: computeAvgChoreAge(familyUnit, kid),
-            totalChores: computeTotalChores(familyUnit, kid),
-            inquiries: computeInquiries(familyUnit, kid),
+            utilization: {numerator: computeUtilization(familyUnit, kid), denominator: 30},
+            choreHistory: {numerator: computeChoreHistory(familyUnit, kid), denominator: 35},
+            avgChoreAge: {numerator: computeAvgChoreAge(familyUnit, kid), denominator: 15},
+            totalChores: {numerator: computeTotalChores(familyUnit, kid), denominator: 10},
+            inquiries: {numerator: computeInquiries(familyUnit, kid), denominator: 10},
             punishments: computePunishments(familyUnit, kid)
 
         };
@@ -31,11 +31,11 @@ function getKreditInformationForFamilyUnit(familyUnit){
 }
 function getKreditInformationForKid(familyUnit, kid){
     return {
-        utilization: computeUtilization(familyUnit, kid),
-        choreHistory: computeChoreHistory(familyUnit, kid),
-        avgChoreAge: computeAvgChoreAge(familyUnit, kid),
-        totalChores: computeTotalChores(familyUnit, kid),
-        inquiries: computeInquiries(familyUnit, kid),
+        utilization: {numerator: computeUtilization(familyUnit, kid), denominator: 30},
+        choreHistory: {numerator: computeChoreHistory(familyUnit, kid), denominator: 35},
+        avgChoreAge: {numerator: computeAvgChoreAge(familyUnit, kid), denominator: 15},
+        totalChores: {numerator: computeTotalChores(familyUnit, kid), denominator: 10},
+        inquiries: {numerator: computeInquiries(familyUnit, kid), denominator: 10},
         punishments: computePunishments(familyUnit, kid)
 
     };

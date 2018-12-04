@@ -26,7 +26,7 @@ function processFamilyUnit(fu) {
             if (occurrencesSinceLastProcessed.length === 0) {
                 //no occurrences for this chore
                 console.log(`Child ${kid.name} in familyUnit ${familyUnit._id} had no occurrences of any chores due today`);
-                return;
+                return {};
             }
             const lastChoreOccurrence = occurrencesSinceLastProcessed[occurrencesSinceLastProcessed.length - 1];
             //check if this chore is in kid's doneChores since last date of occurrence
