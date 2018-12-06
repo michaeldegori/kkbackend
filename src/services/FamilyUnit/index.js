@@ -237,7 +237,7 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward, Alert){
         if (!familyUnit) return res.status(404).json({message: "familyUnit not found"});
 
         const user = await User.findOne({auth0ID: req.user.sub});
-        if (familyUnit.adminsList.indexOf(user._id.toString()) === -1) return res.status(403).json({message: 'Current user does not have access rights to family unit '+req.params.unitid});
+        if (familyUnit.adminsList.indexOf(user.email) === -1) return res.status(403).json({message: 'Current user does not have access rights to family unit '+req.params.unitid});
 
         const newKid = {
             ...childData,
@@ -280,7 +280,7 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward, Alert){
         if (!familyUnit) return res.status(404).json({message: "familyUnit not found"});
 
         const user = await User.findOne({auth0ID: req.user.sub});
-        if (familyUnit.adminsList.indexOf(user._id.toString()) === -1) return res.status(403).json({message: 'Current user does not have access rights to family unit '+req.params.unitid});
+        if (familyUnit.adminsList.indexOf(user.email) === -1) return res.status(403).json({message: 'Current user does not have access rights to family unit '+req.params.unitid});
 
         const removedKidIndex = familyUnit.kidsList.findIndex(kid => kid._id.toString() === req.params.childid);
         if (removedKidIndex === -1) return res.status(404).json({message: `Child id ${req.params.childid} not found`})
