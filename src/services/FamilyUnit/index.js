@@ -236,6 +236,9 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward, Alert){
         const familyUnit = await FamilyUnit.findOne({_id: req.params.unitid});
         if (!familyUnit) return res.status(404).json({message: "familyUnit not found"});
 
+        const user = await User.findOne({auth0ID: req.user.sub});
+        if (familyUnit.adminsList.indexOf(user._id.toString()) === -1) return res.status(403).json({message: 'Current user does not have access rights to family unit '+req.params.unitid});
+
         const newKid = {
             ...childData,
             kiddieKash: 0,
@@ -267,6 +270,25 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward, Alert){
             ...saveResult,
             newKid: saveResult.kidsList[saveResult.kidsList.length-1]
         });
+    });
+
+    /**
+     * DELETE CHILD BY ID
+     */
+    app.delete('/familyunit/:unitid/child/:childid', async (req, res) => {
+        const familyUnit = await FamilyUnit.findOne({_id: req.params.unitid});
+        if (!familyUnit) return res.status(404).json({message: "familyUnit not found"});
+
+        const user = await User.findOne({auth0ID: req.user.sub});
+        if (familyUnit.adminsList.indexOf(user._id.toString()) === -1) return res.status(403).json({message: 'Current user does not have access rights to family unit '+req.params.unitid});
+
+        const removedKidIndex = familyUnit.kidsList.findIndex(kid => kid._id.toString() === req.params.childid);
+        if (removedKidIndex === -1) return res.status(404).json({message: `Child id ${} not found`})
+        familyUnit.kidsList.splice(removedKidIndex, 1);
+
+        const deleteResult = await familyUnit.save();
+        console.log('####saveresult', deleteResult);
+        res.json(deleteResult);
     });
 
     /**
