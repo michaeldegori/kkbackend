@@ -241,7 +241,6 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward, Alert){
 
         const newKid = {
             ...childData,
-            kiddieKash: 0,
             assignedChores: [],
             eligibleRewards: [],
             rewardsRedemptions: [],
@@ -251,11 +250,11 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward, Alert){
             kreditInformation:{
                 savingsRequired: 10,
                 kiddieKashBalance: 0,
-                rewardsRedemptions: { numerator: 0, denominator: 30 },
+                utilization: { numerator: 0, denominator: 30 },
                 choreHistory: { numerator: 0, denominator: 35 },
                 avgChoreAge: { numerator: 0, denominator: 15 },
                 totalChores: { numerator: 0, denominator: 10 },
-                rewardsRequests: { numerator: 0, denominator: 10 },
+                inquiries: { numerator: 0, denominator: 10 },
                 punishments: {},
             }
 
