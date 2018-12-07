@@ -417,6 +417,31 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward, Alert){
             alert: savedAlert
         });
     });
+
+    /**
+     * add admin to family unit:
+     * @param email
+     *
+     */
+    app.post('/familyunit/:unitid/addadmin', async (req, res) => {
+        const adminEmail = req.body.email;
+        if (!adminEmail) return res.status(400).json({message: "Admin email cannot be empty"});
+        if (!adminEmail.match(/^([a-zA-Z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/))
+            return res.status(400).json({message: "Invalid admin email"});
+
+        const familyUnit = await FamilyUnit.findOne({_id: req.params.unitid});
+        if (!familyUnit) return res.status(404).json({message: "familyUnit not found"});
+
+        const user = await User.findOne({auth0ID: req.user.sub});
+        if (familyUnit.adminsList.indexOf(user.email) === -1) return res.status(403).json({message: 'Current user does not have access rights to family unit '+req.params.unitid});
+
+        if (!familyUnit.adminsList) familyUnit.adminsList = [];
+        familyUnit.adminsList.push(adminEmail);
+
+        const saveResult = await familyUnit.save();
+        console.log('####saveresult', saveResult);
+        res.json(saveResult);
+    });
 };
 
 
