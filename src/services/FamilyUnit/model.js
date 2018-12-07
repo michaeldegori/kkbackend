@@ -9,7 +9,6 @@ const KidInfoSchema = new Schema({
     name: {type: String},
     dob: {type: String},
     gender: {type: String, enum: ['male', 'female']},
-    kiddieKash: {type: Number},
     assignedChores: [{type: Schema.Types.ObjectId}],
     eligibleRewards: [{type: Schema.Types.ObjectId}],
     rewardsRedemptions: [{

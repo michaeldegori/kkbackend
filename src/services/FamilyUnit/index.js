@@ -251,11 +251,11 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward, Alert){
             kreditInformation:{
                 savingsRequired: 10,
                 kiddieKashBalance: 0,
-                rewardsRedemptions: { value: 0, denominator: 30 },
-                choreHistory: { value: 0, denominator: 35 },
-                avgChoreAge: { value: 0, denominator: 15 },
-                totalChores: { value: 0, denominator: 10 },
-                rewardsRequests: { value: 0, denominator: 10 },
+                rewardsRedemptions: { numerator: 0, denominator: 30 },
+                choreHistory: { numerator: 0, denominator: 35 },
+                avgChoreAge: { numerator: 0, denominator: 15 },
+                totalChores: { numerator: 0, denominator: 10 },
+                rewardsRequests: { numerator: 0, denominator: 10 },
                 punishments: {},
             }
 
