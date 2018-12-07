@@ -36,7 +36,7 @@ async function routeFactory(app, User, FamilyUnit, Alert){
 
             const alerts = await Alert.find({familyUnit: req.params.unitid});
             console.log(alerts);
-            res.json(alerts);
+            res.json((alerts||[]).reverse());
         }
         catch(err){
             console.log(err);
