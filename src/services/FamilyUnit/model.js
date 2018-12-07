@@ -34,11 +34,11 @@ const KidInfoSchema = new Schema({
     kreditInformation: {
         savingsRequired: {type: Number},
         kiddieKashBalance: {type: Number},
-        rewardsRedemptions: { value: Number, denominator: Number },
-        choreHistory: { value: Number, denominator: Number },
-        avgChoreAge: { value: Number, denominator: Number },
-        totalChores: { value: Number, denominator: Number },
-        rewardsRequests: { value: Number, denominator: Number },
+        rewardsRedemptions: { numerator: Number, denominator: Number },
+        choreHistory: { numerator: Number, denominator: Number },
+        avgChoreAge: { numerator: Number, denominator: Number },
+        totalChores: { numerator: Number, denominator: Number },
+        rewardsRequests: { numerator: Number, denominator: Number },
         punishments: { type: Schema.Types.Mixed },
     }
 
