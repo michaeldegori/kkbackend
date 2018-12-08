@@ -37,7 +37,6 @@ function getKreditInformationForKid(familyUnit, kid){
         totalChores: {numerator: computeTotalChores(familyUnit, kid), denominator: 10},
         inquiries: {numerator: computeInquiries(familyUnit, kid), denominator: 10},
         punishments: computePunishments(familyUnit, kid)
-
     };
 }
 
