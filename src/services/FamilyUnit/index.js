@@ -442,6 +442,38 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward, Alert){
         console.log('####saveresult', saveResult);
         res.json(saveResult);
     });
+
+    /**
+     * mark reward as redeemed (create rewards redemption, lower KK balance)
+     * @param rewardId
+     * @param kidId
+     *
+     */
+    app.post('/familyunit/:unitid/rewardredemption/', async (req, res) => {
+        const {kidId, rewardId} = req.body;
+        if (!kidId || !rewardId) return res.status(400).json({message: "This endpoint for reward completion requires kidID and reward Id"});
+        const familyUnit = await FamilyUnit.findOne({_id: req.params.unitid});
+        if (!familyUnit) return res.status(404).json({message: "familyUnit not found"});
+
+        const user = await User.findOne({auth0ID: req.user.sub});
+        if (familyUnit.adminsList.indexOf(user.email) === -1) return res.status(403).json({message: 'Current user does not have access rights to family unit '+req.params.unitid});
+
+        const rewardToComplete = familyUnit.existingRewards.find(rewardObj => rewardObj._id.toString() === rewardid);
+        if (!rewardToComplete) return res.status(404).json({message: `Reward id ${rewardId} could not be found` });
+
+        const theKid = familyUnit.find(kid => kid._id.toString() === kidId);
+        if (!theKid) return res.status(404).json({message: `Kid id ${kidId} could not be found` });
+
+        theKid.rewardsRedemptions.push({
+            _id: new ObjectId(),
+            timeStamp: new Date().getTime(),
+            reward: rewardToComplete._id.toString()
+        });
+
+        const saveResult = await familyUnit.save();
+        console.log('####reward redemption result', saveResult);
+        res.json(saveResult);
+    });
 };
 
 

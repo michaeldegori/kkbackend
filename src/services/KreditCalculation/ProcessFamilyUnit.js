@@ -56,6 +56,7 @@ function processFamilyUnit(fu) {
             ...kid.kreditInformation,
             ...getKreditInformationForKid(familyUnit, kid)
         }; //merge so we can keep settings and what not
+
         //if it's Friday, add the kiddieKash
         if (new Date().getDay() === 5){
             kid.kreditInformation.kiddieKashBalance = (kid.kreditInformation.kiddieKashBalance || 0) + kid.allowanceAmount;
