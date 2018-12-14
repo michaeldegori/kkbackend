@@ -458,12 +458,12 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward, Alert){
         const user = await User.findOne({auth0ID: req.user.sub});
         if (familyUnit.adminsList.indexOf(user.email) === -1) return res.status(403).json({message: 'Current user does not have access rights to family unit '+req.params.unitid});
 
-        const rewardToComplete = familyUnit.existingRewards.find(rewardObj => rewardObj._id.toString() === rewardid);
+        const rewardToComplete = familyUnit.existingRewards.find(rewardObj => rewardObj._id.toString() === rewardId);
         if (!rewardToComplete) return res.status(404).json({message: `Reward id ${rewardId} could not be found` });
 
         const theKid = familyUnit.find(kid => kid._id.toString() === kidId);
         if (!theKid) return res.status(404).json({message: `Kid id ${kidId} could not be found` });
-        if (!thekid.kreditInformation || !thekid.kreditInformation.kiddieKashBalance || thekid.kreditInformation.kiddieKashBalance < rewardToComplete.kkCost)
+        if (!theKid.kreditInformation || !theKid.kreditInformation.kiddieKashBalance || thekid.kreditInformation.kiddieKashBalance < rewardToComplete.kkCost)
             return res.status(404).json({message: `${theKid.name} does not have a high enough balance to redeem this reward.` });
 
         theKid.rewardsRedemptions.push({
