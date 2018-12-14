@@ -449,7 +449,7 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward, Alert){
      * @param kidId
      *
      */
-    app.post('/familyunit/:unitid/rewardredemption/', async (req, res) => {
+    app.post('/familyunit/:unitid/rewardredemption', async (req, res) => {
         const {kidId, rewardId} = req.body;
         if (!kidId || !rewardId) return res.status(400).json({message: "This endpoint for reward completion requires kidID and reward Id"});
         const familyUnit = await FamilyUnit.findOne({_id: req.params.unitid});
@@ -463,6 +463,8 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward, Alert){
 
         const theKid = familyUnit.find(kid => kid._id.toString() === kidId);
         if (!theKid) return res.status(404).json({message: `Kid id ${kidId} could not be found` });
+        if (!thekid.kreditInformation || !thekid.kreditInformation.kiddieKashBalance || thekid.kreditInformation.kiddieKashBalance < rewardToComplete.kkCost)
+            return res.status(404).json({message: `${theKid.name} does not have a high enough balance to redeem this reward.` });
 
         theKid.rewardsRedemptions.push({
             _id: new ObjectId(),
