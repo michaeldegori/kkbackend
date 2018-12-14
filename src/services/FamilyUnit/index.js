@@ -461,7 +461,7 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward, Alert){
         const rewardToComplete = familyUnit.existingRewards.find(rewardObj => rewardObj._id.toString() === rewardId);
         if (!rewardToComplete) return res.status(404).json({message: `Reward id ${rewardId} could not be found` });
 
-        const theKid = familyUnit.find(kid => kid._id.toString() === kidId);
+        const theKid = familyUnit.kidsList.find(kid => kid._id.toString() === kidId);
         if (!theKid) return res.status(404).json({message: `Kid id ${kidId} could not be found` });
         if (!theKid.kreditInformation || !theKid.kreditInformation.kiddieKashBalance || thekid.kreditInformation.kiddieKashBalance < rewardToComplete.kkCost)
             return res.status(404).json({message: `${theKid.name} does not have a high enough balance to redeem this reward.` });
