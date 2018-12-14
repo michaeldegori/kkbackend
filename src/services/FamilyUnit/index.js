@@ -451,7 +451,7 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward, Alert){
      */
     app.post('/familyunit/:unitid/rewardredemption', async (req, res) => {
         const {kidId, rewardId} = req.body;
-        if (!kidId || !rewardId) return res.status(400).json({message: "This endpoint for reward completion requires kidID and reward Id"});
+        if (!kidId || !rewardId) return res.status(400).json({message: "This endpoint for reward completion requires kidID and rewardId"});
         const familyUnit = await FamilyUnit.findOne({_id: req.params.unitid});
         if (!familyUnit) return res.status(404).json({message: "familyUnit not found"});
 
