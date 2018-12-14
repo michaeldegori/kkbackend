@@ -472,6 +472,8 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward, Alert){
             reward: rewardToComplete._id.toString()
         });
 
+        theKid.kreditInformation.kiddieKashBalance -= rewardToComplete.kkCost;
+
         const saveResult = await familyUnit.save();
         console.log('####reward redemption result', saveResult);
         res.json(saveResult);
