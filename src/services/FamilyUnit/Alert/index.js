@@ -90,15 +90,13 @@ async function routeFactory(app, User, FamilyUnit, Alert){
             const alertSaves = [];
             alerts.forEach(theAlert => {
                 if (!theAlert.invisibleTo) theAlert.invisibleTo = [];
-                if (!theAlert.includes(currentUser._id.toString()) )
+                if (!theAlert.invisibleTo.includes(currentUser._id.toString()) )
                     theAlert.invisibleTo.push(currentUser._id.toString());
                 alertSaves.push(theAlert.save());
             });
             await Promise.all(alertSaves);
 
-            alerts = await Alert.find({familyUnit: req.params.unitid, invisibleTo: {$nin: [currentUser._id.toString()]  }});
-            console.log(alerts);
-            res.json((alerts||[]).reverse());
+            res.json({message: 'ok'});
         }
         catch(err){
             console.log(err);
