@@ -34,7 +34,7 @@ async function routeFactory(app, User, FamilyUnit, Alert){
             if (!familyUnit.adminsList.includes(currentUser.email))
                 return res.status(403).json({message: "Current user token does not have access to family unit id " + req.params.id});
 
-            const alerts = await Alert.find({familyUnit: req.params.unitid, invisibleTo: {$not: {$elemMatch: currentUser._id.toString()}}});
+            const alerts = await Alert.find({familyUnit: req.params.unitid, invisibleTo: {$nin: [currentUser._id.toString()]  }});
             console.log(alerts);
             res.json((alerts||[]).reverse());
         }
