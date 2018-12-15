@@ -20,6 +20,12 @@ function processFamilyUnit(fu) {
     familyUnit.kidsList.forEach(kid => {
         const kidChores = kid.assignedChores.map(choreId => familyUnit.existingChores.find(fc => fc._id.toString() === choreId));
 
+        //if it's Friday, add the kiddieKash
+        if (new Date().getDay() === 6){
+            if (!kid.kreditInformation) kid.kreditInformation = {};
+            kid.kreditInformation.kiddieKashBalance = (kid.kreditInformation.kiddieKashBalance || 0) + kid.allowanceAmount;
+        }
+
         kidChores.forEach(kidChore => {
             const choreRRule = rrulestr(kidChore.repetitionRule);
             const occurrencesSinceLastProcessed = choreRRule.between(new Date(lastProcessedTime), new Date());
@@ -56,11 +62,6 @@ function processFamilyUnit(fu) {
             ...kid.kreditInformation,
             ...getKreditInformationForKid(familyUnit, kid)
         }; //merge so we can keep settings and what not
-
-        //if it's Friday, add the kiddieKash
-        if (new Date().getDay() === 5){
-            kid.kreditInformation.kiddieKashBalance = (kid.kreditInformation.kiddieKashBalance || 0) + kid.allowanceAmount;
-        }
     });
     return {
         lastProcessedTime: new Date().getTime(),
