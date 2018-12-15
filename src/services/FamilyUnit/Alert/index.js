@@ -80,7 +80,7 @@ async function routeFactory(app, User, FamilyUnit, Alert){
             let [currentUser, familyUnit, alerts] = await Promise.all([
                 User.findOne({auth0ID: req.user.sub}),
                 FamilyUnit.findOne({_id: req.params.unitid}),
-                Alert.find({_id: req.params.alertid})
+                Alert.find({familyUnit: req.params.unitid})
             ]);
             if (!currentUser) return res.status(400).json({message: "Incorrect user token"});
             if (!familyUnit) return res.status(404).json({message: "familyUnit not found"});
@@ -90,8 +90,10 @@ async function routeFactory(app, User, FamilyUnit, Alert){
             const alertSaves = [];
             alerts.forEach(theAlert => {
                 if (!theAlert.invisibleTo) theAlert.invisibleTo = [];
+
                 if (!theAlert.invisibleTo.includes(currentUser._id.toString()) )
                     theAlert.invisibleTo.push(currentUser._id.toString());
+
                 alertSaves.push(theAlert.save());
             });
             await Promise.all(alertSaves);
