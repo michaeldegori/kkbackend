@@ -12,6 +12,7 @@ const AlertSchema = new Schema({
     notificationBody: String,
     recipient: String, //matches up to browsing_mode
     doneChoreId: Schema.Types.ObjectId,
+    invisibleTo: []
 });
 
 

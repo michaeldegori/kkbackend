@@ -34,7 +34,7 @@ async function routeFactory(app, User, FamilyUnit, Alert){
             if (!familyUnit.adminsList.includes(currentUser.email))
                 return res.status(403).json({message: "Current user token does not have access to family unit id " + req.params.id});
 
-            const alerts = await Alert.find({familyUnit: req.params.unitid});
+            const alerts = await Alert.find({familyUnit: req.params.unitid, invisibleTo: {"$not": currentUser._id.toString()}});
             console.log(alerts);
             res.json((alerts||[]).reverse());
         }
@@ -72,6 +72,32 @@ async function routeFactory(app, User, FamilyUnit, Alert){
             console.log(err);
             res.status(500).json({err})
         }
+    });
+
+    app.patch('/familyunit/:unitid/alerts/:alertid', async (req, res) => {
+        if (!req.user || !req.user.sub) return res.status(400).json({Err: 'no token'});
+        try {
+            let [currentUser, familyUnit, theAlert] = await Promise.all([
+                User.findOne({auth0ID: req.user.sub}),
+                FamilyUnit.findOne({_id: req.params.unitid}),
+                Alert.findOne({_id: req.params.alertid})
+            ]);
+            if (!currentUser) return res.status(400).json({message: "Incorrect user token"});
+            if (!familyUnit) return res.status(404).json({message: "familyUnit not found"});
+            if (!familyUnit.adminsList.includes(currentUser.email))
+                return res.status(403).json({message: "Current user token does not have access to family unit id " + req.params.id});
+
+            if (!theAlert.invisibleTo) theAlert.invisibleTo = [];
+            theAlert.invisibleTo.push(currentUser._id.toString());
+            await theAlert.save();
+
+            res.json({hiddenAlertId: theAlert._id.toString()});
+        }
+        catch(err){
+            console.log(err);
+            res.status(500).json({err})
+        }
+
     });
 
     /**
