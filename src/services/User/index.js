@@ -12,18 +12,19 @@ module.exports = function(app, User, FamilyUnit){
         let queryData = req.query;
         let currentUser = await User.findOne({auth0ID: req.user.sub});
         console.log('USER DECODED FROM JWT:',req.user, '\nUSER FROM DB:', currentUser);
+        const userMetaData = req.user['https://kiddiekredit.com/user_metadata'];
         try {
 
             // if user doesn't exist, create it
             if (!currentUser) {
                 currentUser = new User({
                     auth0ID: req.user.sub,
-                    firstName: queryData.firstName || '',
-                    lastName: queryData.lastName || '',
-                    email: queryData.email,
+                    firstName: userMetaData.first_name,
+                    lastName: userMetaData.last_name,
+                    email: req.user.email,
                     avatar: req.user.picture,
                     userType: 'parent',
-                    userSubType: queryData.userSubType || 'mother'
+                    userSubType: userMetaData.parent_type || 'mother'
                 });
                 await currentUser.save();
             }
