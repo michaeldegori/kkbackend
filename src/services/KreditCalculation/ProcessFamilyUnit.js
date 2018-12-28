@@ -57,16 +57,19 @@ function processFamilyUnit(fu) {
                 //send push to parent letting them know their kids chore was auto approved
             }
         });
-        //recompute kredit info for family unit
+        //recompute kredit info for kid
         kid.kreditInformation = {
             ...kid.kreditInformation,
             ...getKreditInformationForKid(familyUnit, kid)
         }; //merge so we can keep settings and what not
     });
-    return {
+    const updateDiff = {
         lastProcessedTime: new Date().getTime(),
         kidsList: familyUnit.kidsList
     };
+    console.log('About to the following unit for family unit administered by ' + familyUnit.adminsList.join(" "));
+    console.log(updateDiff);
+    return updateDiff;
 }
 
 module.exports = {
