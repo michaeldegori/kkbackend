@@ -44,7 +44,7 @@ async function processAllChildAllowances() {
                 }
                 bulkOp.find({_id: doc._id}).update({
                     $set: {
-                        [propName]: currentBalance + (kid.allowanceAmount * kreditScore)
+                        [propName]: currentBalance + Math.floor(kid.allowanceAmount * kreditScore * 100)/100
                     }
                 });
             }
