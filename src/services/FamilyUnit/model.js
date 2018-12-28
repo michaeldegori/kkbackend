@@ -30,8 +30,8 @@ const KidInfoSchema = new Schema({
         }
     ],
     allowanceAmount: {type: Number},
+    savingsRequired: {type: Number},
     kreditInformation: {
-        savingsRequired: {type: Number},
         kiddieKashBalance: {type: Number},
         utilization: { numerator: Number, denominator: Number },
         choreHistory: { numerator: Number, denominator: Number },
