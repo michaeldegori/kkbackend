@@ -18,13 +18,24 @@ async function processAllChildAllowances() {
 
     const cursor = dbo.collection('familyunits').find().batchSize(10000);
     for (let doc = await cursor.next(); doc != null; doc = await cursor.next()) {
-        let currentBalance = doc.kreditInformation.kiddieKashBalance;
-        if (typeof currentBalance !== 'number') currentBalance = 0;
-        bulkOp.find({_id: doc._id}).update({
-            $set: {
-                'kreditInformation.kiddieKashBalance': currentBalance + doc.allowanceAmount
-            }
-        });
+        if (!doc.kreditInformation){
+            bulkOp.find({_id: doc._id}).update({
+                $set: {
+                    'kreditInformation': {
+                        kiddieKashBalance: doc.allowanceAmount
+                    }
+                }
+            });
+        }
+        else {
+            let currentBalance = doc.kreditInformation.kiddieKashBalance;
+            if (typeof currentBalance !== 'number') currentBalance = 0;
+            bulkOp.find({_id: doc._id}).update({
+                $set: {
+                    'kreditInformation.kiddieKashBalance': currentBalance + doc.allowanceAmount
+                }
+            });
+        }
     }
     bulkOp.execute(function(err, result){
         console.log(JSON.stringify(result, null, 4));
