@@ -19,23 +19,32 @@ async function processAllChildAllowances() {
     const cursor = dbo.collection('familyunits').find().batchSize(10000);
     for (let doc = await cursor.next(); doc != null; doc = await cursor.next()) {
         doc.kidsList.forEach((kid, kidIndex) => {
-            if (!kid.kreditInformation){
-                const propName = `kidsList.${kidIndex}.kreditInformation`;
-                bulkOp.find({_id: doc._id}).update({
-                    $set: {
-                        [propName]: {
-                            kiddieKashBalance: kid.allowanceAmount
-                        }
-                    }
-                });
-            }
-            else {
+            // if (!kid.kreditInformation){
+            //     const propName = `kidsList.${kidIndex}.kreditInformation`;
+            //     bulkOp.find({_id: doc._id}).update({
+            //         $set: {
+            //             [propName]: {
+            //                 kiddieKashBalance: kid.allowanceAmount
+            //             }
+            //         }
+            //     });
+            // }
+            //else
+            if (kid.kreditInformation) {
                 let currentBalance = kid.kreditInformation.kiddieKashBalance;
-                const propName = `kidsList.${kidIndex}.kreditInformation.kiddieKashBalance`;
                 if (typeof currentBalance !== 'number') currentBalance = 0;
+                const propName = `kidsList.${kidIndex}.kreditInformation.kiddieKashBalance`;
+                const {utilization, choreHistory, avgChoreAge, totalChores, inquiries, punishments} = kid.kreditInformation;
+                let kreditScore =  0.5;
+                try {
+                    kreditScore = (utilization.numerator + choreHistory.numerator + avgChoreAge.numerator + totalChores.numerator + inquiries.numerator - punishments)/100;
+                }
+                catch(err){
+                    console.log("##########ERROR while computing kredit score!", err);
+                }
                 bulkOp.find({_id: doc._id}).update({
                     $set: {
-                        [propName]: currentBalance + kid.allowanceAmount
+                        [propName]: currentBalance + (kid.allowanceAmount * kreditScore)
                     }
                 });
             }

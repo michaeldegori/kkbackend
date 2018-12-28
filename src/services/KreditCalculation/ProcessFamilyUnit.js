@@ -18,13 +18,6 @@ function processFamilyUnit(fu) {
     const lastProcessedTime = familyUnit.lastProcessedTime || (new Date().getTime() - oneDay);
 
     familyUnit.kidsList.forEach(kid => {
-        //if it's Friday, add the kiddieKash
-        if (new Date().getDay() === 5){
-            if (!kid.kreditInformation) kid.kreditInformation = {};
-            console.log(`About to add kiddie kash to ${kid.name}, current balance ${kid.kreditInformation.kiddieKashBalance}`)
-            kid.kreditInformation.kiddieKashBalance = (kid.kreditInformation.kiddieKashBalance || 0) + kid.allowanceAmount;
-        }
-
         const kidChores = kid.assignedChores.map(choreId => familyUnit.existingChores.find(fc => fc._id.toString() === choreId));
         kidChores.forEach(kidChore => {
             const choreRRule = rrulestr(kidChore.repetitionRule);
