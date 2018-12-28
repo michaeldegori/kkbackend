@@ -30,7 +30,7 @@ async function processAllChildAllowances() {
                 });
             }
             else {
-                let currentBalance = doc.kreditInformation.kiddieKashBalance;
+                let currentBalance = kid.kreditInformation.kiddieKashBalance;
                 const propName = `kidsList.${kidIndex}.kreditInformation.kiddieKashBalance`;
                 if (typeof currentBalance !== 'number') currentBalance = 0;
                 bulkOp.find({_id: doc._id}).update({
