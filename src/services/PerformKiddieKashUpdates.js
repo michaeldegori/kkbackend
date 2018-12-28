@@ -19,7 +19,7 @@ async function processAllChildAllowances() {
     const cursor = dbo.collection('familyunits').find().batchSize(10000);
     for (let doc = await cursor.next(); doc != null; doc = await cursor.next()) {
         doc.kidsList.forEach((kid, kidIndex) => {
-            if (!kid[kidIndex].kreditInformation){
+            if (!kid.kreditInformation){
                 const propName = `kidsList.${kidIndex}.kreditInformation`;
                 bulkOp.find({_id: doc._id}).update({
                     $set: {
