@@ -40,7 +40,7 @@ async function processAllChildAllowances() {
                     kreditScore = (utilization.numerator + choreHistory.numerator + avgChoreAge.numerator + totalChores.numerator + inquiries.numerator - punishments)/100;
                 }
                 catch(err){
-                    console.log("##########ERROR while computing kredit score!", err);
+                    console.log("##########ERROR while computing kredit score for " + kid.name + `, ${doc._id}`, err);
                 }
                 bulkOp.find({_id: doc._id}).update({
                     $set: {
