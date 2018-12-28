@@ -1,16 +1,7 @@
-const {processFamilyUnit} = require('./KreditCalculation/ProcessFamilyUnit');
 const mongoClient = require('mongodb').MongoClient;
 
-/**
- * BulkWrite needs format:
- * { updateOne :
-            {
-               "filter" : { "char" : "Eldon" },
-               "update" : { $set : { "status" : "Critical Injury" } }
-            }
-         }
- */
-(async function(){
+
+async function processAllChildAllowances() {
     let connectionString = '';
     let config = {};
     try {
@@ -27,14 +18,18 @@ const mongoClient = require('mongodb').MongoClient;
 
     const cursor = dbo.collection('familyunits').find().batchSize(10000);
     for (let doc = await cursor.next(); doc != null; doc = await cursor.next()) {
-        // updates.push(updateObjectFactory(doc._id, {location: doc.location + "|processed1"}))
-        const processedFamilyUnitDiff = processFamilyUnit(doc);
+        let currentBalance = doc.kreditInformation.kiddieKashBalance;
+        if (typeof currentBalance !== 'number') currentBalance = 0;
         bulkOp.find({_id: doc._id}).update({
-            $set: processedFamilyUnitDiff
+            $set: {
+                'kreditInformation.kiddieKashBalance': currentBalance + doc.allowanceAmount
+            }
         });
     }
     bulkOp.execute(function(err, result){
         console.log(JSON.stringify(result, null, 4));
         nativemDB.close();
     });
-})();
+}
+
+processAllChildAllowances();
