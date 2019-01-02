@@ -73,7 +73,7 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward, Alert){
             repetitionRule: new RRule(rruleConfig),
             startDate: new Date().getTime(),
             endDate: 4105161000000,
-            paused: false
+            paused: false,
         });
 
         familyUnit.existingChores.push(newChore);
@@ -384,28 +384,31 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward, Alert){
         if (!theChore) return res.status(400).json({message: "incorrect chore id"});
 
 
-        doneChoreEntry.status = status;
+        let saveResult1 = familyUnit;
+        if (doneChoreEntry.status !== 'approved'){
+            doneChoreEntry.status = status;
 
-        // familyUnit.kidsList[kidIndex] = Object.assign(theKid, kidUpdate);
-        const saveResult1 = await familyUnit.save();
+            // familyUnit.kidsList[kidIndex] = Object.assign(theKid, kidUpdate);
+            saveResult1 = await familyUnit.save();
 
 
-        let notificationBody = `Congratulations! Your submission for '${theChore.name}' has been approved!`
-        if (status !== "approved"){
-            notificationBody = `Your submission for '${theChore.name}' has been denied. Check with your parent to find why.`;
+            let notificationBody = `Congratulations! Your submission for '${theChore.name}' has been approved!`
+            if (status !== "approved"){
+                notificationBody = `Your submission for '${theChore.name}' has been denied. Check with your parent to find why.`;
+            }
+
+            const alertObj = {
+                familyUnit: familyUnit._id,
+                kid: theKid._id,
+                chore: theChore._id,
+                timeStamp: new Date().getTime(),
+                isTappable: false,
+                status: 'new',
+                notificationBody,
+                recipient: 'child-'+theKid._id.toString(),
+            };
+            createAlertWithPush(alertObj, familyUnit, User, Alert);
         }
-
-        const alertObj = {
-            familyUnit: familyUnit._id,
-            kid: theKid._id,
-            chore: theChore._id,
-            timeStamp: new Date().getTime(),
-            isTappable: false,
-            status: 'new',
-            notificationBody,
-            recipient: 'child-'+theKid._id.toString(),
-        };
-        createAlertWithPush(alertObj, familyUnit, User, Alert);
 
         const theAlert = await Alert.findOne({_id: alertId});
         theAlert.status = "processed";

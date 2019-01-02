@@ -10,7 +10,8 @@ const ChoreSchema = new Schema({
     repetitionRule: {type: String, required: true},
     startDate: {type: Number, required: true},
     endDate: {type: Number},
-    paused: {type: Boolean, default: false}
+    paused: {type: Boolean, default: false},
+    description: String
 });
 
 const ChoreSuggestionSchema = new Schema({
