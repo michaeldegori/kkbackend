@@ -91,7 +91,7 @@ async function routeFactory(app, User, FamilyUnit, Alert){
             alerts.forEach(theAlert => {
                 if (!theAlert.invisibleTo) theAlert.invisibleTo = [];
 
-                if (!theAlert.invisibleTo.includes(currentUser._id.toString()) )
+                if (!theAlert.invisibleTo.includes(currentUser._id.toString()) && theAlert.status !== 'new')
                     theAlert.invisibleTo.push(currentUser._id.toString());
 
                 alertSaves.push(theAlert.save());
