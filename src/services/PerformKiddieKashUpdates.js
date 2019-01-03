@@ -41,7 +41,10 @@ async function processAllChildAllowances() {
                 const {utilization, choreHistory, avgChoreAge, totalChores, inquiries, punishments} = kid.kreditInformation;
                 let kreditScore =  0.5;
                 try {
-                    kreditScore = (utilization.numerator + choreHistory.numerator + avgChoreAge.numerator + totalChores.numerator + inquiries.numerator - punishments)/100;
+                    let actualPunishments = punishments;
+                    if (typeof actualPunishments !== 'number' || isNaN(actualPunishments)) actualPunishments = 0;
+                    kreditScore = (utilization.numerator + choreHistory.numerator + avgChoreAge.numerator + totalChores.numerator + inquiries.numerator - actualPunishments)/100;
+                    if (isNaN(kreditScore)) kreditScore = 0.5;
                 }
                 catch(err){
                     console.log("##########ERROR while computing kredit score for " + kid.name + `, family unit ${doc._id}`, err);
