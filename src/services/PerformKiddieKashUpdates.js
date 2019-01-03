@@ -32,7 +32,11 @@ async function processAllChildAllowances() {
             //else
             if (kid.kreditInformation) {
                 let currentBalance = kid.kreditInformation.kiddieKashBalance;
-                if (typeof currentBalance !== 'number') currentBalance = 0;
+                if (typeof currentBalance !== 'number' || currentBalance == NaN) currentBalance = 0;
+
+                let allowanceAmount = kid.allowanceAmount;
+                if (typeof allowanceAmount !== 'number' || allowanceAmount == NaN) allowanceAmount = 1;
+
                 const propName = `kidsList.${kidIndex}.kreditInformation.kiddieKashBalance`;
                 const {utilization, choreHistory, avgChoreAge, totalChores, inquiries, punishments} = kid.kreditInformation;
                 let kreditScore =  0.5;
@@ -44,7 +48,7 @@ async function processAllChildAllowances() {
                 }
                 bulkOp.find({_id: doc._id}).update({
                     $set: {
-                        [propName]: currentBalance + Math.floor(kid.allowanceAmount * kreditScore * 100)/100
+                        [propName]: currentBalance + Math.floor(allowanceAmount * kreditScore * 100)/100
                     }
                 });
             }
