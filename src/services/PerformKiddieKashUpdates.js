@@ -32,10 +32,10 @@ async function processAllChildAllowances() {
             //else
             if (kid.kreditInformation) {
                 let currentBalance = kid.kreditInformation.kiddieKashBalance;
-                if (typeof currentBalance !== 'number' || currentBalance == NaN) currentBalance = 0;
+                if (typeof currentBalance !== 'number' || isNaN(currentBalance)) currentBalance = 0;
 
                 let allowanceAmount = kid.allowanceAmount;
-                if (typeof allowanceAmount !== 'number' || allowanceAmount == NaN) allowanceAmount = 1;
+                if (typeof allowanceAmount !== 'number' || isNaN(allowanceAmount)) allowanceAmount = 1;
 
                 const propName = `kidsList.${kidIndex}.kreditInformation.kiddieKashBalance`;
                 const {utilization, choreHistory, avgChoreAge, totalChores, inquiries, punishments} = kid.kreditInformation;
