@@ -44,11 +44,14 @@ async function processAllChildAllowances() {
                     kreditScore = (utilization.numerator + choreHistory.numerator + avgChoreAge.numerator + totalChores.numerator + inquiries.numerator - punishments)/100;
                 }
                 catch(err){
-                    console.log("##########ERROR while computing kredit score for " + kid.name + `, ${doc._id}`, err);
+                    console.log("##########ERROR while computing kredit score for " + kid.name + `, family unit ${doc._id}`, err);
+                    return;
                 }
+                const newBalance = currentBalance + Math.floor(allowanceAmount * kreditScore * 100)/100;
+                console.log(`Setting balance $${newBalance} for ${kid.name} in f.u. $doc._id`);
                 bulkOp.find({_id: doc._id}).update({
                     $set: {
-                        [propName]: currentBalance + Math.floor(allowanceAmount * kreditScore * 100)/100
+                        [propName]: newBalance
                     }
                 });
             }
