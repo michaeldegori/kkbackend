@@ -47,8 +47,9 @@ async function processAllChildAllowances() {
                     console.log("##########ERROR while computing kredit score for " + kid.name + `, family unit ${doc._id}`, err);
                     return;
                 }
-                const newBalance = currentBalance + Math.floor(allowanceAmount * kreditScore * 100)/100;
-                console.log(`Setting balance $${newBalance} for ${kid.name} in f.u. $doc._id`);
+                let newBalance = currentBalance + Math.floor(allowanceAmount * kreditScore * 100)/100;
+
+                console.log(`Setting balance from $${currentBalance} to $${newBalance} for ${kid.name} in f.u. ${doc._id} . Kredit score ${kreditScore}`);
                 bulkOp.find({_id: doc._id}).update({
                     $set: {
                         [propName]: newBalance
