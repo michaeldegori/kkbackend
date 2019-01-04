@@ -31,6 +31,7 @@ const KidInfoSchema = new Schema({
     ],
     allowanceAmount: {type: Number},
     savingsRequired: {type: Number},
+    avatar: {type:String},
     kreditInformation: {
         kiddieKashBalance: {type: Number},
         utilization: { numerator: Number, denominator: Number },
