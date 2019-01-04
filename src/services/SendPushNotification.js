@@ -15,6 +15,7 @@ module.exports = async function(pushTokens=['ExponentPushToken[hXBk4VGSK9EKwhix6
         // Construct a message (see https://docs.expo.io/versions/latest/guides/push-notifications.html)
         messages.push({
             to: pushToken,
+            title: "KiddieKredit",
             sound: 'default',
             body: message,
             data: { testProp: 'testProp value' },
