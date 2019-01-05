@@ -60,7 +60,7 @@ module.exports = function(app, User, FamilyUnit){
             res.json({
                 familyUnit: {
                     ...familyUnit.toObject(),
-                    adminsList: familyAdmins
+                    adminsList: familyAdmins.filter(admin => admin !== null)
                 },
                 currentUser
             });
