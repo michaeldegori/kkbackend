@@ -488,7 +488,8 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward, Alert){
         const user = await User.findOne({auth0ID: req.user.sub});
         if (familyUnit.adminsList.indexOf(user.email) === -1) return res.status(403).json({message: 'Current user does not have access rights to family unit '+req.params.unitid});
 
-        if (!familyUnit.adminsList) familyUnit.adminsList = [];
+        if (!familyUnit.adminsList || !familyUnit.adminsList.length || familyUnit.adminsList.length <= 1)
+            return res.status(400).json({message: "Cannot remove the last familyUnit admin"});
         const adminIndex = familyUnit.adminsList.findIndex(aEmail => adminEmail === aEmail);
         if (adminIndex === -1) return res.status(404).json({message: "An admin with that email doesn't exist in this family unit"});
 
