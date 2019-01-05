@@ -450,8 +450,21 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward, Alert){
         familyUnit.adminsList.push(adminEmail);
 
         const saveResult = await familyUnit.save();
-        console.log('####saveresult', saveResult);
-        res.json(saveResult);
+        console.log('####addAdmin saveresult', saveResult);
+
+        let familyAdminPromises = [];
+        if (saveResult.adminsList.length > 0)
+            familyAdminPromises = saveResult.adminsList.map(parentEmail => User.findOne({email: parentEmail}));
+
+        const familyAdmins = await Promise.all(familyAdminPromises);
+        const familyUnitObj = saveResult.toObject();
+
+        res.json({
+            familyUnit: {
+                ...familyUnitObj,
+                adminsList: familyAdmins
+            }
+        });
     });
 
     /**
