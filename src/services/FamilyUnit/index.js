@@ -25,15 +25,15 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward, Alert){
                         )
                     );
 
-            const familyAdmins = await Promise.all(familyAdminPromises);
-            const familyUnitObj = familyUnit.toObject();
+            let familyAdmins = await Promise.all(familyAdminPromises);
+            familyAdmins = familyAdmins.map((admin, idx) => admin || familyUnit.adminsList[idx])
 
-            console.log(familyAdmins);
+            const familyUnitObj = familyUnit.toObject();
 
             res.json({
                 familyUnit: {
                     ...familyUnitObj,
-                    adminsList: familyAdmins.filter(admin => admin !== null)
+                    adminsList: familyAdmins
                 },
                 currentUser
             });
@@ -458,13 +458,15 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward, Alert){
         if (saveResult.adminsList.length > 0)
             familyAdminPromises = saveResult.adminsList.map(parentEmail => User.findOne({email: parentEmail}));
 
-        const familyAdmins = await Promise.all(familyAdminPromises);
+        let familyAdmins = await Promise.all(familyAdminPromises);
+        familyAdmins = familyAdmins.map((admin, idx) => admin || saveResult.adminsList[idx])
+
         const familyUnitObj = saveResult.toObject();
 
         res.json({
             familyUnit: {
                 ...familyUnitObj,
-                adminsList: familyAdmins.filter(admin => admin !== null)
+                adminsList: familyAdmins
             }
         });
     });

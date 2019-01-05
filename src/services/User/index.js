@@ -55,12 +55,13 @@ module.exports = function(app, User, FamilyUnit){
                         )
                     );
 
-            const familyAdmins = await Promise.all(familyAdminPromises);
+            let familyAdmins = await Promise.all(familyAdminPromises);
+            familyAdmins = familyAdmins.map((admin, idx) => admin || familyUnit.adminsList[idx])
 
             res.json({
                 familyUnit: {
                     ...familyUnit.toObject(),
-                    adminsList: familyAdmins.filter(admin => admin !== null)
+                    adminsList: familyAdmins
                 },
                 currentUser
             });
