@@ -28,10 +28,12 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward, Alert){
             const familyAdmins = await Promise.all(familyAdminPromises);
             const familyUnitObj = familyUnit.toObject();
 
+            console.log(familyAdmins);
+
             res.json({
                 familyUnit: {
                     ...familyUnitObj,
-                    adminsList: familyAdmins
+                    adminsList: familyAdmins.filter(admin => admin !== null)
                 },
                 currentUser
             });
@@ -462,7 +464,7 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward, Alert){
         res.json({
             familyUnit: {
                 ...familyUnitObj,
-                adminsList: familyAdmins
+                adminsList: familyAdmins.filter(admin => admin !== null)
             }
         });
     });
