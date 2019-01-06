@@ -464,10 +464,8 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward, Alert){
         const familyUnitObj = saveResult.toObject();
 
         res.json({
-            familyUnit: {
-                ...familyUnitObj,
-                adminsList: familyAdmins
-            }
+            ...familyUnitObj,
+            adminsList: familyAdmins
         });
     });
 
@@ -490,6 +488,7 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward, Alert){
 
         if (!familyUnit.adminsList || !familyUnit.adminsList.length || familyUnit.adminsList.length <= 1)
             return res.status(400).json({message: "Cannot remove the last familyUnit admin"});
+
         const adminIndex = familyUnit.adminsList.findIndex(aEmail => adminEmail === aEmail);
         if (adminIndex === -1) return res.status(404).json({message: "An admin with that email doesn't exist in this family unit"});
 
@@ -508,10 +507,8 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward, Alert){
         const familyUnitObj = saveResult.toObject();
 
         res.json({
-            familyUnit: {
-                ...familyUnitObj,
-                adminsList: familyAdmins
-            }
+            ...familyUnitObj,
+            adminsList: familyAdmins
         });
     });
 
