@@ -11,7 +11,8 @@ const ChoreSchema = new Schema({
     startDate: {type: Number, required: true},
     endDate: {type: Number},
     paused: {type: Boolean, default: false},
-    description: String
+    description: String,
+    deleted: {type: Boolean, default: false}
 });
 
 const ChoreSuggestionSchema = new Schema({
