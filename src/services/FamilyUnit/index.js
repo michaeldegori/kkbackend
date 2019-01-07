@@ -103,6 +103,14 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward, Alert){
         const familyUnit = await FamilyUnit.findOne({_id: req.params.unitid});
         if (!familyUnit) return res.status(404).json({message: "familyUnit not found"});
 
+        if (choreData.repetitionRule && choreData.startDate){
+            //this is the case where im updating a known chore programmatically, not through UI
+            let oldChoreObjectIdx = familyUnit.existingChores.findIndex(chore => chore._id.toString() === req.params.choreid);
+            familyUnit.existingChores[oldChoreObjectIdx] = choreData;
+            const saveResult = await familyUnit.save();
+            res.json(saveResult);
+            return;
+        }
 
         let oldChoreObject = familyUnit.existingChores.find(chore => chore._id.toString() === req.params.choreid);
 
