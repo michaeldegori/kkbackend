@@ -436,7 +436,7 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward, Alert){
      * @param email
      *
      */
-    app.post('/familyunit/:unitid/addadmin', async (req, res) => {
+    app.post('/familyunit/:unitid/admin', async (req, res) => {
         const adminEmail = req.body.email;
         if (!adminEmail) return res.status(400).json({message: "Admin email cannot be empty"});
         if (!adminEmail.match(/^([a-zA-Z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/))
@@ -474,7 +474,7 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward, Alert){
      * @param email
      *
      */
-    app.delete('/familyunit/:unitid/addadmin', async (req, res) => {
+    app.delete('/familyunit/:unitid/admin', async (req, res) => {
         const adminEmail = req.body.email;
         if (!adminEmail) return res.status(400).json({message: "Admin email cannot be empty"});
         if (!adminEmail.match(/^([a-zA-Z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/))
