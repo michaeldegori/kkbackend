@@ -65,12 +65,12 @@ exports.routeFactory = async function(app, User, ChoreSuggestion){
 
 exports.isValidChore = function(choreData){
     const {name, priority, kkReward,
-        notes, freq, weekdays} = choreData;
+        notes, freq, weekdays, repetitionRule, startDate} = choreData;
     return name && typeof priority !== 'undefined' &&
         typeof notes !== 'undefined' &&
         typeof kkReward !== 'undefined' &&
-        typeof freq !== 'undefined' &&
-        typeof weekdays !== 'undefined';
+        (typeof freq !== 'undefined' || typeof repetitionRule !== 'undefined') &&
+        (typeof weekdays !== 'undefined' || typeof startDate !== 'undefined');
 };
 
 module.exports = exports;
