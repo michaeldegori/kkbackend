@@ -55,6 +55,8 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward, Alert){
         if (!isValidChore(choreData)) return res.status(400).json({message: "Invalid chore data"});
         const familyUnit = await FamilyUnit.findOne({_id: req.params.unitid});
         if (!familyUnit) return res.status(404).json({message: "familyUnit not found"});
+        const user = await User.findOne({auth0ID: req.user.sub});
+        if (familyUnit.adminsList.indexOf(user.email) === -1) return res.status(403).json({message: 'Current user does not have access rights to family unit '+req.params.unitid});
 
         const rruleConfig = {
             freq: RRule[req.body.freq],
@@ -102,6 +104,9 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward, Alert){
         if (!isValidChore(choreData)) return res.status(400).json({message: "Invalid chore data"});
         const familyUnit = await FamilyUnit.findOne({_id: req.params.unitid});
         if (!familyUnit) return res.status(404).json({message: "familyUnit not found"});
+
+        const user = await User.findOne({auth0ID: req.user.sub});
+        if (familyUnit.adminsList.indexOf(user.email) === -1) return res.status(403).json({message: 'Current user does not have access rights to family unit ' + req.params.unitid});
 
         if (choreData.repetitionRule && choreData.startDate){
             //this is the case where im updating a known chore programmatically, not through UI
@@ -174,6 +179,9 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward, Alert){
         const familyUnit = await FamilyUnit.findOne({_id: req.params.unitid});
         if (!familyUnit) return res.status(404).json({message: "familyUnit not found"});
 
+        const user = await User.findOne({auth0ID: req.user.sub});
+        if (familyUnit.adminsList.indexOf(user.email) === -1) return res.status(403).json({message: 'Current user does not have access rights to family unit '+req.params.unitid});
+
         const newReward = new Reward({
             _id: new ObjectId(),
             ...rewardData
@@ -204,6 +212,9 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward, Alert){
 
         const familyUnit = await FamilyUnit.findOne({_id: req.params.unitid});
         if (!familyUnit) return res.status(404).json({message: "familyUnit not found"});
+
+        const user = await User.findOne({auth0ID: req.user.sub});
+        if (familyUnit.adminsList.indexOf(user.email) === -1) return res.status(403).json({message: 'Current user does not have access rights to family unit '+req.params.unitid});
 
         let rewardBeingEdited;
 
@@ -315,16 +326,15 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward, Alert){
         if (kidIndex === -1) return res.status(404).json({message: "kid not found in family unit"});
 
         familyUnit.kidsList[kidIndex] = Object.assign(familyUnit.kidsList[kidIndex], req.body);
-        let saveResult;
         try {
-            saveResult = await familyUnit.save();
+            let saveResult = await familyUnit.save();
+            res.json(saveResult);
         }
         catch(e){
             console.log(e);
-            return res.status(400).json({message: "Invalid child data. " + JSON.stringify(e)});
+            res.status(400).json({message: "Invalid child data. " + JSON.stringify(e)});
         }
 
-        res.json(saveResult);
     });
 
     /**

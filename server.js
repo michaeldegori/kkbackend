@@ -14,6 +14,8 @@ const Chore = require('./src/services/DefaultChore/model').modelFactory(db);
 const ChoreSuggestion = require('./src/services/DefaultChore/model').suggestionModelFactory(db);
 const Reward = require('./src/services/DefaultReward/model').modelFactory(db);
 const Alert = require('./src/services/FamilyUnit/Alert/model').modelFactory(db);
+const ParentDashboardEI = require('./src/services/EducationalInfo/model').parentInfoModelFactory(db);
+const KidDashboardEI = require('./src/services/EducationalInfo/model').kidInfoModelFactory(db);
 
 const sendPushNotification = require('./src/services/SendPushNotification.js');
 
@@ -55,6 +57,7 @@ require('./src/services/FamilyUnit')(app, User, FamilyUnit, Chore, Reward, Alert
 require('./src/services/DefaultChore').routeFactory(app, User, ChoreSuggestion);
 require('./src/services/DefaultReward').routeFactory(app, User, Reward);
 require('./src/services/FamilyUnit/Alert').routeFactory(app, User, FamilyUnit, Alert);
+require('./src/services/EducationalInfo').routeFactory(app, User, ParentDashboardEI, KidDashboardEI);
 
 
 app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
