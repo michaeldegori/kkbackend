@@ -455,10 +455,11 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward, Alert){
      *
      */
     app.post('/familyunit/:unitid/admin', async (req, res) => {
-        const adminEmail = req.body.email;
+        let adminEmail = req.body.email;
         if (!adminEmail) return res.status(400).json({message: "Admin email cannot be empty"});
         if (!adminEmail.match(/^([a-zA-Z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/))
             return res.status(400).json({message: "Invalid admin email"});
+        adminEmail = adminEmail.toLowerCase();
 
         const familyUnit = await FamilyUnit.findOne({_id: req.params.unitid});
         if (!familyUnit) return res.status(404).json({message: "familyUnit not found"});

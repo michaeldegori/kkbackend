@@ -31,6 +31,7 @@ module.exports = function(app, User, FamilyUnit){
             }
             // retrieve familyunit for this user
             let familyUnit = await FamilyUnit.findOne({adminsList: req.user.email.toLowerCase()});
+            console.log('Family unit exists: '+ !!familyUnit);
             // if familyunit doesnt exist, create it
             if (!familyUnit) {
                 familyUnit = new FamilyUnit({
