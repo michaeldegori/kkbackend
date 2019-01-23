@@ -28,7 +28,7 @@ exports.routeFactory = async function(app, User, ParentDashboardEI, KidDashboard
         }
     });
 
-    app.put('/educationalinfo/:clientroute', async (req,res) => {
+    app.put('/educationalinfo   /:clientroute', async (req,res) => {
         const rte = req.params.clientroute;
         if (!supportedClientRoutes[rte]) return res.status(404).json({message: `${rte} not found`});
         if (Object.keys(req.body).length === 0) return res.status(400).json({message: `empty request body`});
