@@ -20,8 +20,8 @@ module.exports = function(app, User, FamilyUnit){
             if (!currentUser) {
                 currentUser = new User({
                     auth0ID: req.user.sub,
-                    firstName: userMetaData.first_name,
-                    lastName: userMetaData.last_name,
+                    firstName: userMetaData.firstName,
+                    lastName: userMetaData.lastName,
                     email: (req.user.email||"").toLowerCase(),
                     avatar: req.user.picture,
                     userType: 'parent',
