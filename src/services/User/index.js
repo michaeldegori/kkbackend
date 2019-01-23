@@ -13,6 +13,7 @@ module.exports = function(app, User, FamilyUnit){
         let currentUser = await User.findOne({auth0ID: req.user.sub});
         console.log('USER DECODED FROM JWT:',req.user, '\nUSER FROM DB:', currentUser);
         const userMetaData = req.user['https://kiddiekredit.com/user_metadata'];
+        console.log('finishregistration for user with metadata', userMetaData);
         try {
 
             // if user doesn't exist, create it
