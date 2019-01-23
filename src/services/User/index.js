@@ -22,7 +22,7 @@ module.exports = function(app, User, FamilyUnit){
                     auth0ID: req.user.sub,
                     firstName: userMetaData.first_name,
                     lastName: userMetaData.last_name,
-                    email: req.user.email,
+                    email: (req.user.email||"").toLowerCase(),
                     avatar: req.user.picture,
                     userType: 'parent',
                     userSubType: userMetaData.parent_type || 'mother'
@@ -30,7 +30,7 @@ module.exports = function(app, User, FamilyUnit){
                 await currentUser.save();
             }
             // retrieve familyunit for this user
-            let familyUnit = await FamilyUnit.findOne({adminsList: req.user.email});
+            let familyUnit = await FamilyUnit.findOne({adminsList: req.user.email.toLowerCase()});
             // if familyunit doesnt exist, create it
             if (!familyUnit) {
                 familyUnit = new FamilyUnit({
