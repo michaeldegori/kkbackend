@@ -63,7 +63,16 @@ async function processAllChildAllowances() {
 
     }
     bulkOp.execute(function(err, result){
-        console.log(JSON.stringify(result, null, 4));
+        const stringifiedResult = JSON.stringify(result, null, 4);
+        let home = process.env['HOME']
+        if (!fs.existsSync(`${home}/kklogs/kiddieKashUpdates.log`)){
+            fs.writeFile(`${home}/kklogs/kiddieKashUpdates.log`, `${new Date().toISOString()}\n${stringifiedResult}`, err => console.log('File save operation concluded, error:' + err));
+        }
+        else {
+            fs.appendFile(`${home}/kklogs/kiddieKashUpdates.log`,
+                `\n\n${new Date().toISOString()}\n${stringifiedResult}`,
+                err => console.log('File save operation concluded, error:' + err))
+        }
         nativemDB.close();
     });
 }

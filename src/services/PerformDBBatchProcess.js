@@ -1,5 +1,6 @@
 const {processFamilyUnit} = require('./KreditCalculation/ProcessFamilyUnit');
 const mongoClient = require('mongodb').MongoClient;
+const fs = require('fs');
 
 /**
  * BulkWrite needs format:
@@ -34,7 +35,16 @@ const mongoClient = require('mongodb').MongoClient;
         });
     }
     bulkOp.execute(function(err, result){
-        console.log(JSON.stringify(result, null, 4));
+        const stringifiedResult = JSON.stringify(result, null, 4);
+        let home = process.env['HOME']
+        if (!fs.existsSync(`${home}/kklogs/batchProcess.log`)){
+            fs.writeFile(`${home}/kklogs/batchProcess.log`, `${new Date().toISOString()}\n${stringifiedResult}`, err => console.log('File save operation concluded, error:' + err));
+        }
+        else {
+            fs.appendFile(`${home}/kklogs/batchProcess.log`,
+                `\n\n${new Date().toISOString()}\n${stringifiedResult}`,
+                err => console.log('File save operation concluded, error:' + err))
+        }
         nativemDB.close();
     });
 })();
