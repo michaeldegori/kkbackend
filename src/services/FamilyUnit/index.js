@@ -461,11 +461,17 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward, Alert){
             return res.status(400).json({message: "Invalid admin email"});
         adminEmail = adminEmail.toLowerCase();
 
-        const familyUnit = await FamilyUnit.findOne({_id: req.params.unitid});
-        if (!familyUnit) return res.status(404).json({message: "familyUnit not found"});
-
-        const user = await User.findOne({auth0ID: req.user.sub});
-        if (familyUnit.adminsList.indexOf(user.email) === -1) return res.status(403).json({message: 'Current user does not have access rights to family unit '+req.params.unitid});
+        const [familyUnit, user, newUserAdmin] = await Promise.all([
+            FamilyUnit.findOne({_id: req.params.unitid}),
+            User.findOne({auth0ID: req.user.sub}),
+            User.findOne({email: adminEmail})
+        ]);
+        if (!familyUnit)
+            return res.status(404).json({message: "familyUnit not found"});
+        if (familyUnit.adminsList.indexOf(user.email) === -1)
+            return res.status(403).json({message: 'Current user does not have access rights to family unit '+req.params.unitid});
+        if (newUserAdmin)
+            return res.status(404).json({message: "That user already has an account with it's own family unit. If they want to join this familyUnit they need a new account under a new email." });
 
         if (!familyUnit.adminsList) familyUnit.adminsList = [];
         familyUnit.adminsList.push(adminEmail);
@@ -551,8 +557,10 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward, Alert){
 
         const theKid = familyUnit.kidsList.find(kid => kid._id.toString() === kidId);
         if (!theKid) return res.status(404).json({message: `Kid id ${kidId} could not be found` });
-        if (!theKid.kreditInformation || !theKid.kreditInformation.kiddieKashBalance || theKid.kreditInformation.kiddieKashBalance < rewardToComplete.kkCost)
-            return res.status(404).json({message: `${theKid.name} does not have a high enough balance to redeem this reward.` });
+        if (!theKid.kreditInformation || !theKid.kreditInformation.kiddieKashBalance || theKid.kreditInformation.kiddieKashBalance < rewardToComplete.kkCost){
+            res.status(404).json({message: `${theKid.name} does not have a high enough balance to redeem this reward.` });
+            return;
+        }
 
         theKid.rewardsRedemptions.push({
             _id: new ObjectId(),
