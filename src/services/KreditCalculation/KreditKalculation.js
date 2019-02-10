@@ -43,17 +43,18 @@ function getKreditInformationForKid(familyUnit, kid){
 
 
 function computeUtilization(familyUnit, kid){
+    const timeStampLastWeek = new Date().getTime() - 1000*60*60*24*7;
     const redeemedRewards = kid.rewardsRedemptions.map(rewardLink => ({
         ...rewardLink,
         reward: familyUnit.existingRewards.find(fReward => fReward._id.toString() === rewardLink.reward.toString())
     }));
-    const redeemedRewardsValue = redeemedRewards.reduce((p,c) => p + Number(c.reward.kkCost), 0);
+    const redeemedRewardsValue = redeemedRewards.filter(r => r.timeStamp > timeStampLastWeek).reduce((p,c) => p + Number(c.reward.kkCost), 0);
     const kkBalance = (kid.kreditInformation && kid.kreditInformation.kiddieKashBalance) || 0;
 
-    if (redeemedRewardsValue === 0) return 30;
+    if (redeemedRewardsValue === 0 && kkBalance > 0) return 30;
 
-    const utilizationThreshold = (kid.kreditInformation && kid.kreditInformation.savingsRequired) || 10;
-    const utilizationRatio = Math.round(redeemedRewardsValue*100/kkBalance);
+    let utilizationThreshold = 10;
+    const utilizationRatio = kkBalance > 0 ? Math.round(redeemedRewardsValue*100/(kkBalance+redeemedRewardsValue)) : 100;
     if (utilizationRatio <= 10) return 20;
 
     if (utilizationRatio <= (100 - utilizationThreshold)) return 30;
@@ -102,6 +103,10 @@ function computeInquiries(familyUnit, kid) {
 function computePunishments(familyUnit, kid) {
     return 0;
 }
+
+function dateFromObjectId (objectId) {
+    return new Date(parseInt(objectId.substring(0, 8), 16) * 1000);
+};
 
 
 module.exports = {

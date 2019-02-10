@@ -237,15 +237,15 @@ test('ComputeAvgChoreAge - Computes average chore age correctly for max and emma
         const maxChoresScore = computeAvgChoreAge(mockFamilyUnit, mockMax);
         const emmaChoresScore = computeAvgChoreAge(mockFamilyUnit, mockEmma);
         const maxChoreAgeDays = (
-            (new Date() - new Date(mockFamilyUnit.existingChores[0].startDate)) +
-            (new Date() - new Date(mockFamilyUnit.existingChores[1].startDate))
+            (new Date().getTime() - mockFamilyUnit.existingChores[0].startDate) +
+            (new Date().getTime() - mockFamilyUnit.existingChores[1].startDate)
         )/oneDay;
         const emmaChoreAgeDays = (
-            (new Date() - new Date(mockFamilyUnit.existingChores[0].startDate)) +
-            (new Date() - new Date(mockFamilyUnit.existingChores[2].startDate))
+            (new Date().getTime() - mockFamilyUnit.existingChores[0].startDate) +
+            (new Date().getTime() - mockFamilyUnit.existingChores[2].startDate)
         )/oneDay;
-        const maxChoreAge = Math.ceil(maxChoreAgeDays/2);
-        const emmaChoreAge = Math.ceil(emmaChoreAgeDays/2);
+        const maxChoreAge = maxChoreAgeDays >= 42 ? 42 : Math.ceil(maxChoreAgeDays/2);
+        const emmaChoreAge = emmaChoreAgeDays >= 42 ? 42 : Math.ceil(emmaChoreAgeDays/2);
         expect(maxChoresScore).toBe(15 - (42 - maxChoreAge)*0.5);
         expect(emmaChoresScore).toBe(15 - (42 - emmaChoreAge)*0.5);
     });
