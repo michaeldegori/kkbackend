@@ -1,11 +1,6 @@
 const {RRule, rrulestr} = require('rrule');
 const {getKreditInformationForKid} = require('./KreditKalculation.js');
 
-// const testRule1 = rrulestr('DTSTART:20181027T010047Z\nRRULE:FREQ=WEEKLY;INTERVAL=1;BYDAY=FR;UNTIL=21010131T000000Z');
-// const oneDay = 1000 * 60 * 60 * 24;
-// const occurrences = testRule1.between(new Date(new Date().getTime() - oneDay*21), new Date());
-// console.log(RRule.optionsToString({freq: testRule1.options.freq}));
-// console.log(occurrences);
 
 /**
  *

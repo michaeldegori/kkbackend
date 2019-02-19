@@ -8,3 +8,4 @@ mongoexport --db kiddiekredit --collection builtinrewards --out builtinrewards.j
 mongoexport --db kiddiekredit --collection choresuggestions --out choresuggestions.json
 mongoexport --db kiddiekredit --collection familyunits --out familyunits.json
 mongoexport --db kiddiekredit --collection users --out users.json
+scp ./* kkbig:~/backups/
