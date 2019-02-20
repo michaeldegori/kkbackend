@@ -34,9 +34,12 @@ async function routeFactory(app, User, FamilyUnit, Alert){
             if (!familyUnit.adminsList.includes(currentUser.email))
                 return res.status(403).json({message: "Current user token does not have access to family unit id " + req.params.id});
 
-            const alerts = await Alert.find({familyUnit: req.params.unitid, invisibleTo: {$nin: [currentUser._id.toString()]  }});
+            const alerts = await Alert
+                .find({familyUnit: req.params.unitid, invisibleTo: {$nin: [currentUser._id.toString()]  }})
+                .sort({timeStamp: -1})
+                .limit(50);
             console.log(alerts);
-            res.json((alerts||[]).reverse());
+            res.json(alerts||[]);
         }
         catch(err){
             console.log(err);
@@ -80,7 +83,7 @@ async function routeFactory(app, User, FamilyUnit, Alert){
             let [currentUser, familyUnit, alerts] = await Promise.all([
                 User.findOne({auth0ID: req.user.sub}),
                 FamilyUnit.findOne({_id: req.params.unitid}),
-                Alert.find({familyUnit: req.params.unitid})
+                Alert.find({familyUnit: req.params.unitid, recipient: 'parent'})
             ]);
             if (!currentUser) return res.status(400).json({message: "Incorrect user token"});
             if (!familyUnit) return res.status(404).json({message: "familyUnit not found"});
