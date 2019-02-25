@@ -63,7 +63,10 @@ function computeUtilization(familyUnit, kid){
 
 function computeChoreHistory(familyUnit, kid) {
     if (!kid.delinquentChoreInstances || kid.delinquentChoreInstances.length === 0) return 35;
-    const delinquentChores = kid.delinquentChoreInstances.map(delinquentRecord => ({
+    const sixWeeksAgo = new Date().getTime() - 1000 * 60 * 60 * 24 * 7 * 6 - 3600000;
+    const delinquentChores = kid.delinquentChoreInstances
+        .filter(delinquentRecord => delinquentRecord.timeStamp > sixWeeksAgo)
+        .map(delinquentRecord => ({
         ...delinquentRecord,
         chore: familyUnit.existingChores.find(chore=> chore._id.toString() === delinquentRecord.chore.toString())
     }));
