@@ -268,6 +268,7 @@ module.exports = function(app, User, FamilyUnit, Chore, Reward, Alert){
             doneChores: [],
             delinquentChoreInstances: [],
             allowanceAmount: Math.round((new Date().getTime() - getDOB(childData.dob))/oneYear),
+            savingsRequired: 10,
             kreditInformation:{
                 savingsRequired: 10,
                 kiddieKashBalance: 0,
