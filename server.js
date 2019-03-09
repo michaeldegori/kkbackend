@@ -22,7 +22,7 @@ const KidDashboardEI = require('./src/services/EducationalInfo/model').kidInfoMo
 const sendPushNotification = require('./src/services/SendPushNotification.js');
 
 //middlewares and health check
-if (process.env.NODE_ENV === 'production') app.all('*', ensureSecure);
+//if (process.env.NODE_ENV === 'production') app.all('*', ensureSecure);
 app.use(cors());
 app.use(bp.json());
 app.use(function(req, res, next){
@@ -81,6 +81,7 @@ function listenCB(port){
     console.log("Web server listening on port " + port);
 }
 
+//we need to get to where everyone's updated before we can use this
 function ensureSecure(req, res, next){
     if(req.secure){
         // OK, continue
