@@ -1,0 +1,70 @@
+{
+  "Resources": {
+    "HealthCheck": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "FunctionName": "HealthCheck",
+        "Handler": "index.lambda_handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "CanaryRole",
+            "Arn"
+          ]
+        },
+        "Code": {
+          "S3Bucket": "kk-internal-resources",
+          "S3Key": "canaries_source_code.zip"
+        },
+        "Timeout": 300,
+        "Runtime": "python3.7"
+      }
+    },
+    "CanaryRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "RoleName": "CanaryRole",
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [{
+            "Effect": "Allow",
+            "Principal": {
+              "Service": [ "lambda.amazonaws.com" ]
+            },
+            "Action": [ "sts:AssumeRole" ]
+          }]
+        },
+        "Path": "/",
+        "Policies": [{
+          "PolicyName": "AWSLambdaBasicExecutionRole",
+          "PolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [{
+              "Effect": "Allow",
+              "Action": [
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents"
+              ],
+              "Resource": "*"
+            }]
+          }
+        },
+          {
+            "PolicyName": "AmazonS3FullAccess",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [{
+                "Effect": "Allow",
+                "Action": "s3:*",
+                "Resource": [
+                  "arn:aws:s3:::kk-internal-resources",
+                  "arn:aws:s3:::kk-internal-resources/*"
+                ]
+              }]
+            }
+          }
+        ]
+      }
+    }
+  }
+}
