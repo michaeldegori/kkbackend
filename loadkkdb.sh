@@ -8,3 +8,4 @@ mongoimport --db kiddiekredit --collection builtinrewards --file builtinrewards.
 mongoimport --db kiddiekredit --collection choresuggestions --file choresuggestions.json
 mongoimport --db kiddiekredit --collection familyunits --file familyunits.json
 mongoimport --db kiddiekredit --collection users --file users.json
+mongoimport --db kiddiekredit --collection advert --file advert.json

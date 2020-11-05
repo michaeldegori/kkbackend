@@ -1,10 +1,14 @@
 const mongoose = require('mongoose');
 
 
-module.exports = function(app, User, Advert) {
+module.exports = function(app, FamilyUnit, Advert) {
 
-  const getChildAge = (dob) => {
-    // use date of birth to calculate age
+  const getChildAge = (dobStr) => {
+    const dobArray = dobStr.split("-");
+    const dobYear = dobArray[2].parseInt();
+    const year = now.getFullYear();
+    const kidAge = year - dobYear;
+    return kidAge;
   }
 
   // get adverts based on user characteristics: number of kids, ages of kids, userlocation 

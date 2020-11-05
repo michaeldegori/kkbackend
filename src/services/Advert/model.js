@@ -12,9 +12,11 @@ const AdvertSchema = new Schema({
     email: [{ type: String, required: true }],  
     ageMin: { type: Number, required: true }, 
     ageMax: { type: Number, required: true },
-    loc: [
-        { type: "Point", coordinates: [ number, number ], required: false }
-    ],
+    loc: {
+      type: { type: String, default: "Point" },
+      coordinates: { type: [Number] },
+      required: false
+    },
   }],
 })
 

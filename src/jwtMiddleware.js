@@ -10,13 +10,15 @@ const jwtValidationMiddleware = jwt({
 
 const openPaths = [
     "/healthcheck",
+    // "/advert",
     "/favicon.ico",
     "/",
     "/logout",
 ];
 
 const fullopenRoutes = [
-    "/pushnotification"
+    "/pushnotification",
+    "/advert"
 ];
 
 

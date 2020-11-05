@@ -16,10 +16,9 @@ const Chore = require('./src/services/DefaultChore/model').modelFactory(db);
 const ChoreSuggestion = require('./src/services/DefaultChore/model').suggestionModelFactory(db);
 const Reward = require('./src/services/DefaultReward/model').modelFactory(db);
 const Alert = require('./src/services/FamilyUnit/Alert/model').modelFactory(db);
-// const Advert = require('./src/services/Advert/model').modelFactory(db);
+const Advert = require('./src/services/Advert/model.js')(db);
 const ParentDashboardEI = require('./src/services/EducationalInfo/model').parentInfoModelFactory(db);
 const KidDashboardEI = require('./src/services/EducationalInfo/model').kidInfoModelFactory(db);
-
 const sendPushNotification = require('./src/services/SendPushNotification.js');
 
 //middlewares and health check
@@ -35,6 +34,20 @@ app.use(function(req, res, next){
 app.get('/healthcheck', (req, res) => {
     console.log('received health check');
     res.end("health check succeeded");
+});
+
+// app.get('/advert', (req, res) => {
+//     console.log('received advert check');
+//     res.end("advert check succeeded");
+// });
+
+app.get('/advert', async (req, res) => {
+    const targetAdvert = await Advert.findOne({_id: req.params.advertid});
+    if (!targetAdvert)
+        return res.status(404).json({err: 'Advert not found'});
+
+    if (targetAdvert)
+        return res.json({targetAdvert});
 });
 app.use(require('./src/jwtMiddleware.js'));
 
@@ -57,6 +70,7 @@ app.get('/pushnotification/:userid', async (req, res) => {
 });
 
 require('./src/services/User')(app, User, FamilyUnit);
+require('./src/services/Advert')(app, User, Advert);
 require('./src/services/FamilyUnit')(app, User, FamilyUnit, Chore, Reward, Alert);
 require('./src/services/DefaultChore').routeFactory(app, User, ChoreSuggestion);
 require('./src/services/DefaultReward').routeFactory(app, User, Reward);
