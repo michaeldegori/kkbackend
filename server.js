@@ -16,6 +16,7 @@ const Chore = require('./src/services/DefaultChore/model').modelFactory(db);
 const ChoreSuggestion = require('./src/services/DefaultChore/model').suggestionModelFactory(db);
 const Reward = require('./src/services/DefaultReward/model').modelFactory(db);
 const Alert = require('./src/services/FamilyUnit/Alert/model').modelFactory(db);
+// const Advert = require('./src/services/Advert/model').modelFactory(db);
 const ParentDashboardEI = require('./src/services/EducationalInfo/model').parentInfoModelFactory(db);
 const KidDashboardEI = require('./src/services/EducationalInfo/model').kidInfoModelFactory(db);
 

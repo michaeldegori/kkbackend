@@ -96,7 +96,7 @@ module.exports = function(app, User, Advert) {
     }
   });
 
-  app.delete('/:id', getAdvert, async (req, res) => {
+  app.delete('advert/:id', getAdvert, async (req, res) => {
     try {
       await res.advert.deleteOne();
       res.json({ message: "Advert has been deleted" });
