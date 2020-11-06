@@ -23,9 +23,39 @@ module.exports = function(app, FamilyUnit, Advert) {
     // if !userLocation then...
     // if (getChildAge(kidId) < 14) then...
     // if (number of kids > 2) then...
-  })
+  });
 
-  app.post('/advert/:id/advert', async (req, res) => {
+  app.get('/advert', async (req, res) => {
+    try {
+      let adverts = await Advert.findOne({loc: req.advert.coordinates});
+      if (adverts) {
+        Advert.aggregate([
+          {
+            $geoNear: {
+              near: {
+                type: "Point",
+                coordinates: [ x, y ]
+              },
+              distanceField: "dist.calculated",
+              maxDistance: 15,
+              spherical: true
+            }
+          }
+        ], (err, data) => {
+          if (err) {
+            next(err);
+            return;
+          }
+          res.send(data);
+        })
+      }
+    }
+    catch(err) {
+      res.json({err: err.message});
+    }
+  });
+
+  app.post('/advert', async (req, res) => {
     const newAdvert = new Advert({
       _id: new ObjectId(),
       companyName: req.body.companyName,
