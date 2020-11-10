@@ -3,13 +3,14 @@ const mongoose = require('mongoose');
 
 module.exports = function(app, FamilyUnit, Advert) {
 
-  const getChildAge = (dobStr) => {
-    const dobArray = dobStr.split("-");
-    const dobYear = dobArray[2].parseInt();
-    const year = now.getFullYear();
-    const kidAge = year - dobYear;
-    return kidAge;
-  }
+  // MOVED TO ADVERTSTORE!!
+  // const getChildAge = (dobStr) => {
+  //   const dobArray = dobStr.split("-");
+  //   const dobYear = dobArray[2].parseInt();
+  //   const year = now.getFullYear();
+  //   const kidAge = year - dobYear;
+  //   return kidAge;
+  // }
 
   // get adverts based on user characteristics: number of kids, ages of kids, userlocation 
   // from Advert
@@ -20,9 +21,6 @@ module.exports = function(app, FamilyUnit, Advert) {
     } catch (err) {
       res.status(500).json({message: err.message})
     }
-    // if !userLocation then...
-    // if (getChildAge(kidId) < 14) then...
-    // if (number of kids > 2) then...
   });
 
   app.get('/advert', async (req, res) => {
@@ -63,13 +61,13 @@ module.exports = function(app, FamilyUnit, Advert) {
       logo: req.body.logo,
       productName: req.body.productName,
       content: req.body.content,
+      ageMin: req.body.ageMin,
+      ageMax: req.body.ageMax,
       bid: req.body.bid,
-      userInfo:
+      targets:
         {
           email: req.body.email,
-          ageMin: req.body.ageMin,
-          ageMax: req.body.ageMax,
-          famSize: req.body.famSize,
+          childAge: req.body.childAge,
           loc: req.body.loc
         }
         
@@ -80,7 +78,7 @@ module.exports = function(app, FamilyUnit, Advert) {
     } catch (err) {
       res.status(400).json({ message: err.message });
     }
-  })
+  });
 
   async function getAdvert(req, res, next) {
     let advert;
@@ -119,8 +117,8 @@ module.exports = function(app, FamilyUnit, Advert) {
     if (!req.body.bid) {
       res.advert.bid = req.body.bid;
     }
-    if (!req.body.userInfo) {
-      res.advert.userInfo = req.body.userInfo;
+    if (!req.body.targets) {
+      res.advert.targets = req.body.targets;
     }
     try {
       const updatedAdvert = await res.adver.save();
