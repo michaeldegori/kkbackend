@@ -20,9 +20,6 @@ module.exports = function(app, FamilyUnit, Advert) {
     } catch (err) {
       res.status(500).json({message: err.message})
     }
-    // if !userLocation then...
-    // if (getChildAge(kidId) < 14) then...
-    // if (number of kids > 2) then...
   });
 
   app.get('/advert', async (req, res) => {
