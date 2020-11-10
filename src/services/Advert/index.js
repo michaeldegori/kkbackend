@@ -1,141 +1,50 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
+const fetch = require('node-fetch');
 
-
-module.exports = function(app, FamilyUnit, Advert) {
-
-  const getChildAge = (dobStr) => {
-    const dobArray = dobStr.split("-");
-    const dobYear = dobArray[2].parseInt();
-    const year = now.getFullYear();
-    const kidAge = year - dobYear;
-    return kidAge;
-  }
+module.exports = function(app) {
 
   // get adverts based on user characteristics: number of kids, ages of kids, userlocation 
-  // from Advert
+  // from advertisers campaigns
   app.get('/advert', async (req, res) => {
-    try {
-      const adverts = await Advert.find()
-      res.json(adverts)
-    } catch (err) {
-      res.status(500).json({message: err.message})
-    }
-    // if !userLocation then...
-    // if (getChildAge(kidId) < 14) then...
-    // if (number of kids > 2) then...
-  });
+    if (!req.query.latitude || !req.query.longitude || !req.query.email) 
+      return res.status(400).json({message: 'illegal request'});
 
-  app.get('/advert', async (req, res) => {
-    try {
-      let adverts = await Advert.findOne({loc: req.advert.coordinates});
-      if (adverts) {
-        Advert.aggregate([
-          {
-            $geoNear: {
-              near: {
-                type: "Point",
-                coordinates: [ x, y ]
-              },
-              distanceField: "dist.calculated",
-              maxDistance: 15,
-              spherical: true
-            }
-          }
-        ], (err, data) => {
-          if (err) {
-            next(err);
-            return;
-          }
-          res.send(data);
-        })
-      }
-    }
-    catch(err) {
-      res.json({err: err.message});
-    }
-  });
+    const ipAddress = req.ip;
+    if(!ipAddress) return res.status(400).json({message: 'unable to get ip address'});
+    console.log(ipAddress)
 
-  app.post('/advert', async (req, res) => {
-    const newAdvert = new Advert({
-      _id: new ObjectId(),
-      companyName: req.body.companyName,
-      productImg: req.body.productImg,
-      logo: req.body.logo,
-      productName: req.body.productName,
-      content: req.body.content,
-      bid: req.body.bid,
-      userInfo:
-        {
-          email: req.body.email,
-          ageMin: req.body.ageMin,
-          ageMax: req.body.ageMax,
-          famSize: req.body.famSize,
-          loc: req.body.loc
-        }
-        
+    const requestURL = 'http://localhost:8080'
+    // had this hardcoded in, but wanted to make it clear that this url may need to be changed
+
+    try {
+    const advert = await fetch(`http://aj2263.online/ads-api?clientIp=${ipAddress}`
+    + `&requestUrl=${requestURL}&format=json&key=13ac80de3da2825eca448542a09f1925`
+    + `&latitude=${latitude}&longitude=${longitude}&email=${email}`, {
+      method: 'GET',
+      headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+      },
     });
-    try {
-      const saveResult = await newAdvert.save();
-      res.status(201).json({ saveResult });
+    if (!advert) return res.status(404).json({message: "advert not found"})
+
+    let jsonifiedAdvert = await advert.json()
+    console.log(jsonifiedAdvert)
+    if(jsonifiedAdvert) 
+      return res.status(200).json({
+        creative: jsonifiedAdvert.creative, 
+        click: jsonifiedAdvert.click, 
+        beacon: jsonifiedAdvert.beacon
+      })
+    
+    res.json({
+        jsonifiedAdvert
+    });
+
     } catch (err) {
-      res.status(400).json({ message: err.message });
-    }
-  })
-
-  async function getAdvert(req, res, next) {
-    let advert;
-    try {
-      advert = await Advert.findById(req.params.id);
-      if (!advert) {
-        return res.status(404).json({ message: "Advert not found"});
-      }
-    } catch (err) {
-      return res.status(500).json({ message: err.message });
-    }
-    res.advert = advert;
-    next();
-  }
-
-  app.put('/:id', getAdvert, async (req, res) => {
-
-  });
-
-  app.patch('/:id', getAdvert, async (req, res) => {
-    if (!req.body.companyName) {
-      res.advert.companyName = req.body.companyName;
-    }
-    if (!req.body.productImg) {
-      res.advert.productImg = req.body.productImg;
-    }
-    if (!req.body.logo) {
-      res.advert.logo = req.body.logo;
-    }
-    if (!req.body.productName) {
-      res.advert.productName = req.body.productName;
-    }
-    if (!req.body.content) {
-      res.advert.content = req.body.content;
-    }
-    if (!req.body.bid) {
-      res.advert.bid = req.body.bid;
-    }
-    if (!req.body.userInfo) {
-      res.advert.userInfo = req.body.userInfo;
-    }
-    try {
-      const updatedAdvert = await res.adver.save();
-      res.json(updatedAdvert);
-    } catch (err) {
-      res.status(400).json({ message: err.message });
-    }
-  });
-
-  app.delete('advert/:id', getAdvert, async (req, res) => {
-    try {
-      await res.advert.deleteOne();
-      res.json({ message: "Advert has been deleted" });
-    } catch (err) {
+      console.log(err)
       res.status(500).json({ message: err.message });
     }
   });
+
 }

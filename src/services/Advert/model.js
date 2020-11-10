@@ -7,11 +7,12 @@ const AdvertSchema = new Schema({
   logo: { type: String, required: true },
   productName: { type: String, required: true }, 
   content: [{ type: String, required: false }],
+  ageMin: { type: Number, required: true }, 
+  ageMax: { type: Number, required: true },
   bid: { type: Number, required: true },
   targets: [{
-    email: [{ type: String, required: true }],  
-    ageMin: { type: Number, required: true }, 
-    ageMax: { type: Number, required: true },
+    email: [{ type: String, required: true }],
+    childAge: [{type: Number, required: false}],  
     loc: {
       type: { type: String, default: "Point" },
       coordinates: { type: [Number] },
