@@ -1,139 +1,36 @@
-const mongoose = require('mongoose');
 
-
-module.exports = function(app, FamilyUnit, Advert) {
-
-  // MOVED TO ADVERTSTORE!!
-  // const getChildAge = (dobStr) => {
-  //   const dobArray = dobStr.split("-");
-  //   const dobYear = dobArray[2].parseInt();
-  //   const year = now.getFullYear();
-  //   const kidAge = year - dobYear;
-  //   return kidAge;
-  // }
+module.exports = function(app, email, dob, location) {
 
   // get adverts based on user characteristics: number of kids, ages of kids, userlocation 
-  // from Advert
-  app.get('/advert', async (req, res) => {
+  // from advertisers campaigns
+  app.get('/advertisers/:advertiserId/campaigns', async (req, res) => {
+    let currentUser = await User.findOne({auth0ID: req.user.sub})
     try {
-      const adverts = await Advert.find()
-      res.json(adverts)
+        const campaigns = await fetch('https://nXXXX.epom.com/rest-api', {
+          method: 'GET',
+          headers: {
+            'Authorization': '[api-key]',
+            'Accept': 'application/json'
+          },
+        });
+        if (!campaigns) return res.status(404).json({err: 'Campaigns not found'});
+        // check if there is email, dob or location that matches with the campaign
+        if (email || dob || location) {
+          const targetAdvert = await campaigns.find({email: currentUser.email, location: currentUser.location, dob: currentUser.dob});
+          if (!targetAdvert) return res.status(404).json({err: 'Advert not found'});
+        } 
+        // const targetToLocation = await campaigns.findOne({location: currentUser.location})
+        // const targetToDob = await campaigns.findOne({dob: currentUser.dob})
+          
+        res.json({
+          campaigns,
+          targetadvert
+        });
+
     } catch (err) {
-      res.status(500).json({message: err.message})
-    }
-  });
-
-  app.get('/advert', async (req, res) => {
-    try {
-      let adverts = await Advert.findOne({loc: req.advert.coordinates});
-      if (adverts) {
-        Advert.aggregate([
-          {
-            $geoNear: {
-              near: {
-                type: "Point",
-                coordinates: [ x, y ]
-              },
-              distanceField: "dist.calculated",
-              maxDistance: 15,
-              spherical: true
-            }
-          }
-        ], (err, data) => {
-          if (err) {
-            next(err);
-            return;
-          }
-          res.send(data);
-        })
-      }
-    }
-    catch(err) {
-      res.json({err: err.message});
-    }
-  });
-
-  app.post('/advert', async (req, res) => {
-    const newAdvert = new Advert({
-      _id: new ObjectId(),
-      companyName: req.body.companyName,
-      productImg: req.body.productImg,
-      logo: req.body.logo,
-      productName: req.body.productName,
-      content: req.body.content,
-      ageMin: req.body.ageMin,
-      ageMax: req.body.ageMax,
-      bid: req.body.bid,
-      targets:
-        {
-          email: req.body.email,
-          childAge: req.body.childAge,
-          loc: req.body.loc
-        }
-        
-    });
-    try {
-      const saveResult = await newAdvert.save();
-      res.status(201).json({ saveResult });
-    } catch (err) {
-      res.status(400).json({ message: err.message });
-    }
-  });
-
-  async function getAdvert(req, res, next) {
-    let advert;
-    try {
-      advert = await Advert.findById(req.params.id);
-      if (!advert) {
-        return res.status(404).json({ message: "Advert not found"});
-      }
-    } catch (err) {
-      return res.status(500).json({ message: err.message });
-    }
-    res.advert = advert;
-    next();
-  }
-
-  app.put('/:id', getAdvert, async (req, res) => {
-
-  });
-
-  app.patch('/:id', getAdvert, async (req, res) => {
-    if (!req.body.companyName) {
-      res.advert.companyName = req.body.companyName;
-    }
-    if (!req.body.productImg) {
-      res.advert.productImg = req.body.productImg;
-    }
-    if (!req.body.logo) {
-      res.advert.logo = req.body.logo;
-    }
-    if (!req.body.productName) {
-      res.advert.productName = req.body.productName;
-    }
-    if (!req.body.content) {
-      res.advert.content = req.body.content;
-    }
-    if (!req.body.bid) {
-      res.advert.bid = req.body.bid;
-    }
-    if (!req.body.targets) {
-      res.advert.targets = req.body.targets;
-    }
-    try {
-      const updatedAdvert = await res.adver.save();
-      res.json(updatedAdvert);
-    } catch (err) {
-      res.status(400).json({ message: err.message });
-    }
-  });
-
-  app.delete('advert/:id', getAdvert, async (req, res) => {
-    try {
-      await res.advert.deleteOne();
-      res.json({ message: "Advert has been deleted" });
-    } catch (err) {
+      console.log(err)
       res.status(500).json({ message: err.message });
     }
   });
+  
 }
