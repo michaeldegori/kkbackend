@@ -27,3 +27,99 @@ In production, the nodejs app is managed by pm2. The configuration being used by
 
 The jwt secret needs to be manually deployed to prod as well in order to do a fresh build. 
 
+### Data model
+
+All the models are defined in a pretty straightforward manner as mongoose models in the `services` folder. Each model represents a collection of objects with a particular shape. We have the following models:
+
+1. Educational Info:
+  * ParentDashboardEI: the string values of the educational info modals in the parent app.
+  * KidDashboardEI: the string values of the educational info modals in the child app.
+2. Alert: This represents one of the alerts you see in the Alerts tab.
+  ```
+  {
+      familyUnit: {type: Schema.Types.ObjectId, index: true},
+      kid: {type: Schema.Types.ObjectId},
+      chore: {type: Schema.Types.ObjectId},
+      timeStamp: Number,
+      isTappable: Boolean,
+      status: {type: String, enum:["new", "processed"]},
+      notificationBody: String,
+      recipient: String, //matches up to browsing_mode
+      doneChoreId: Schema.Types.ObjectId,
+      invisibleTo: []
+  }
+  ```
+3. Family Unit (our main unit of data, the centerpoint of an account):
+```
+{
+    adminsList: [{type: 'String'}],
+    kidsList: [KidInfoSchema],
+    existingChores: [ChoreSchema],
+    choreExceptions: [Schema.Types.Mixed],
+    existingRewards: [RewardSchema],
+    lastProcessedTime: Number
+}
+```
+4. Kid Info:
+```
+{
+    name: {type: String},
+    dob: {type: String},
+    gender: {type: String, enum: ['male', 'female']},
+    assignedChores: [Chore],
+    eligibleRewards: [Reward],
+    rewardsRedemptions: [{
+        id: Schema.Types.ObjectId,
+        timeStamp: Number,
+        reward: Schema.Types.ObjectId
+    }],
+    doneChores: [{
+        id: Schema.Types.ObjectId,
+        timeStamp: Number,
+        chore: Schema.Types.ObjectId,
+        status: {type: String, enum: ['approved', 'unapproved', 'denied']}
+    }],
+    delinquentChoreInstances: [
+        {
+            id: Schema.Types.ObjectId,
+            timeStamp: Number,
+            chore: Schema.Types.ObjectId
+        }
+    ],
+    allowanceAmount: {type: Number},
+    savingsRequired: {type: Number},
+    avatar: {type:String},
+    kreditInformation: {
+        kiddieKashBalance: {type: Number},
+        utilization: { numerator: Number, denominator: Number },
+        choreHistory: { numerator: Number, denominator: Number },
+        avgChoreAge: { numerator: Number, denominator: Number },
+        totalChores: { numerator: Number, denominator: Number },
+        inquiries: { numerator: Number, denominator: Number },
+        punishments: { type: Schema.Types.Mixed },
+    }
+}
+```
+5. Chore
+```
+{
+    name: {type: String, required: true},
+    priority: {type: String, required: true},
+    kkReward: {type: String, required: true},
+    notes: {type: String},
+    repetitionRule: {type: String, required: true},
+    startDate: {type: Number, required: true},
+    endDate: {type: Number},
+    paused: {type: Boolean, default: false},
+    description: String,
+    deleted: {type: Boolean, default: false}
+}
+```
+6. Reward
+```
+{
+    name: {type: String},
+    kkCost: {type: Number},
+    notes: ""
+}
+```
